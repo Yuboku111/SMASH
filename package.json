@@ -1,0 +1,20 @@
+{
+  "name": "smash-online-game",
+  "version": "1.0.0",
+  "description": "オンライン対戦3Dファイティングゲーム",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "socket.io": "^5.7.0"
+  },
+  "keywords": ["game", "online", "multiplayer", "3d", "fighting"],
+  "author": "Your Name",
+  "license": "MIT"
+}

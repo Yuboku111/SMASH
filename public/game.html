@@ -1,0 +1,4474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D バトルファイター</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+            background: #000;
+            color: #00ffff;
+        }
+        
+        /* サイバーパンクメニュー画面 */
+        #menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 0, 150, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 0, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0a, #1a0d1a, #0d1a1a, #000);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00ffff;
+            z-index: 1000;
+            animation: cyberpunkGlow 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes cyberpunkGlow {
+            0% { 
+                box-shadow: inset 0 0 50px rgba(0, 255, 255, 0.1);
+            }
+            100% { 
+                box-shadow: inset 0 0 80px rgba(255, 0, 255, 0.2);
+            }
+        }
+        
+        #menu.hidden {
+            display: none;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-logo {
+            max-width: 600px;
+            height: auto;
+            filter: 
+                drop-shadow(0 0 10px rgba(0, 255, 255, 0.6))
+                drop-shadow(0 0 20px rgba(255, 0, 255, 0.4))
+                drop-shadow(0 0 30px rgba(0, 255, 255, 0.3));
+            animation: logoGlow 3s ease-in-out infinite alternate;
+            transition: all 0.3s ease;
+        }
+        
+        .game-logo:hover {
+            filter: 
+                drop-shadow(0 0 15px rgba(0, 255, 255, 0.8))
+                drop-shadow(0 0 30px rgba(255, 0, 255, 0.6))
+                drop-shadow(0 0 45px rgba(0, 255, 255, 0.5));
+            transform: scale(1.05);
+        }
+        
+        @keyframes logoGlow {
+            0% {
+                filter: 
+                    drop-shadow(0 0 10px rgba(0, 255, 255, 0.6))
+                    drop-shadow(0 0 20px rgba(255, 0, 255, 0.4))
+                    drop-shadow(0 0 30px rgba(0, 255, 255, 0.3));
+            }
+            100% {
+                filter: 
+                    drop-shadow(0 0 15px rgba(255, 0, 255, 0.8))
+                    drop-shadow(0 0 25px rgba(0, 255, 255, 0.6))
+                    drop-shadow(0 0 40px rgba(255, 0, 255, 0.4));
+            }
+        }
+        
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .menu-subtitle {
+            font-family: 'Rajdhani', monospace;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 50px;
+            color: #00ff88;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                opacity: 0.8;
+                text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+            }
+            50% { 
+                opacity: 1;
+                text-shadow: 0 0 25px rgba(0, 255, 136, 1);
+            }
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .menu-button {
+            font-family: 'Rajdhani', monospace;
+            font-weight: 600;
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 2px solid #00ffff;
+            padding: 15px 40px;
+            font-size: 22px;
+            color: #00ffff;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.3),
+                inset 0 0 10px rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            min-width: 250px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .menu-button:hover::before {
+            left: 100%;
+        }
+        
+        .menu-button:hover {
+            transform: translateY(-2px);
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 255, 0.6),
+                inset 0 0 20px rgba(255, 0, 255, 0.2);
+            text-shadow: 0 0 15px rgba(255, 0, 255, 1);
+            background: linear-gradient(45deg, rgba(255, 0, 255, 0.1), rgba(0, 255, 255, 0.1));
+        }
+        
+        .menu-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 
+                0 0 15px rgba(0, 255, 255, 0.8),
+                inset 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .menu-controls {
+            margin-top: 40px;
+            text-align: center;
+            color: #00ff88;
+            font-size: 16px;
+            font-family: 'Rajdhani', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+        
+        .menu-controls h3 {
+            margin-bottom: 15px;
+            color: #bbb;
+        }
+        
+        /* ゲーム画面のスタイル */
+        #gameContainer {
+            display: none;
+        }
+        
+        #gameCanvas {
+            display: block;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 100px;
+            pointer-events: none;
+        }
+        
+        .playerInfo {
+            font-family: 'Rajdhani', monospace;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 0;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            min-width: 200px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.4),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .playerInfo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: scanLine 2s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .playerName {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px currentColor;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .healthBar {
+            width: 100%;
+            height: 18px;
+            background: #111;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #00ffff;
+            margin-bottom: 10px;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.3),
+                inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        .health {
+            height: 100%;
+            background: linear-gradient(to right, #ff0066, #ff3399, #ff0066);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 102, 0.6);
+            animation: healthPulse 2s ease-in-out infinite;
+        }
+        
+        .player1 .health {
+            background: linear-gradient(to right, #0066ff, #3399ff, #0066ff);
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.6);
+        }
+        
+        @keyframes healthPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .healthValue {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 15px currentColor;
+            color: #00ffff;
+            letter-spacing: 1px;
+        }
+        
+        .specialBar {
+            width: 100%;
+            height: 8px;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #fff;
+            margin-top: 8px;
+        }
+        
+        .specialEnergy {
+            height: 100%;
+            background: linear-gradient(to right, #ffaa00, #ffff00);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .chargeBar {
+            width: 100%;
+            height: 6px;
+            background: #111;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid #666;
+            margin-top: 4px;
+        }
+        
+        .chargeEnergy {
+            height: 100%;
+            background: linear-gradient(to right, #ff00ff, #ff66ff);
+            transition: width 0.1s ease;
+            box-shadow: 0 0 8px #ff00ff;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        .playerControls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .playerControls h3 {
+            margin: 0;
+            font-size: 11px;
+            font-weight: normal;
+        }
+        
+        .player1Controls h3 {
+            color: #6699ff;
+        }
+        
+        .player2Controls h3 {
+            color: #ff6666;
+        }
+        
+        .controlKeys {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            text-align: center;
+            max-width: 200px;
+        }
+        
+        .controlItem {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 8px;
+            min-width: 25px;
+            text-align: center;
+        }
+        
+        .keyAction {
+            font-size: 7px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+        
+        /* コンボ表示のスタイル */
+        .combo-display {
+            position: absolute;
+            top: 150px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .combo-display.player1 {
+            left: 20%;
+            transform-origin: center;
+        }
+        
+        .combo-display.player2 {
+            right: 20%;
+            transform-origin: center;
+        }
+        
+        .combo-display.show {
+            display: block !important;
+            animation: comboFloat 0.5s ease-out;
+        }
+        
+        @keyframes comboFloat {
+            0% { 
+                transform: translateY(20px) scale(0.8); 
+                opacity: 0; 
+            }
+            50% { 
+                transform: translateY(-10px) scale(1.2); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+        }
+        
+        /* ダメージ表示のスタイル */
+        .damage-number {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6600;
+            text-shadow: 0 0 5px #000, 2px 2px 2px #000;
+            z-index: 999;
+            pointer-events: none;
+            animation: damageFloat 1s ease-out forwards;
+        }
+        
+        @keyframes damageFloat {
+            0% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-50px) scale(0.8); 
+                opacity: 0; 
+            }
+        }
+        
+        #winner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px 60px;
+            border-radius: 20px;
+            border: 3px solid #fff;
+            animation: winnerPulse 1s infinite;
+        }
+        
+        @keyframes winnerPulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* 勝利メニューのスタイル */
+        #victoryMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            z-index: 2000;
+        }
+        
+        .victory-content {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px 50px;
+            border-radius: 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.4),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            position: relative;
+            max-width: 500px;
+            width: auto;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .victory-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #ff00ff;
+            animation: winnerPulse 1s infinite;
+            text-align: center;
+            white-space: nowrap;
+            overflow: visible;
+            color: #00ffff;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+        
+        .victory-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .victory-button {
+            font-family: 'Rajdhani', monospace;
+            font-weight: 600;
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 2px solid #00ffff;
+            padding: 12px 25px;
+            font-size: 16px;
+            color: #00ffff;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.3),
+                inset 0 0 10px rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            min-width: 140px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .victory-button:hover {
+            transform: translateY(-2px);
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 255, 0.6),
+                inset 0 0 20px rgba(255, 0, 255, 0.2);
+            text-shadow: 0 0 15px rgba(255, 0, 255, 1);
+            background: linear-gradient(45deg, rgba(255, 0, 255, 0.1), rgba(0, 255, 255, 0.1));
+        }
+        
+        .victory-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 
+                0 0 15px rgba(0, 255, 255, 0.8),
+                inset 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .victory-button.home {
+            border-color: #ff6666;
+            color: #ff6666;
+            text-shadow: 0 0 10px rgba(255, 102, 102, 0.8);
+        }
+        
+        .victory-button.home:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+            text-shadow: 0 0 15px rgba(255, 51, 51, 1);
+            box-shadow: 
+                0 0 20px rgba(255, 51, 51, 0.6),
+                inset 0 0 20px rgba(255, 51, 51, 0.2);
+        }
+        
+        .victory-button.replay {
+            border-color: #00ff88;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        }
+        
+        .victory-button.replay:hover {
+            border-color: #00ff66;
+            color: #00ff66;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 1);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 102, 0.6),
+                inset 0 0 20px rgba(0, 255, 102, 0.2);
+        }
+        
+        /* 設定メニューのスタイル */
+        #nameSettingsMenu, #controlSettingsMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            z-index: 3000;
+            font-family: 'Rajdhani', monospace;
+        }
+        
+        .settings-content {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 50px;
+            border-radius: 15px;
+            border: 3px solid #00ffff;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.4),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .settings-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #00ffff;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff;
+            text-transform: uppercase;
+        }
+        
+        /* 名前設定用 */
+        .name-inputs {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .name-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .name-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+        
+        .name-input {
+            padding: 12px 20px;
+            font-size: 16px;
+            font-family: 'Rajdhani', monospace;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+            color: #00ffff;
+            text-align: center;
+            width: 200px;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.3),
+                inset 0 0 10px rgba(0, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 255, 0.6),
+                inset 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+        
+        /* 操作設定用 */
+        .control-settings {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .control-player {
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .control-player h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+        
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .control-label {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .key-button {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            text-transform: uppercase;
+        }
+        
+        .key-button:hover {
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 
+                0 0 15px rgba(255, 0, 255, 0.5),
+                inset 0 0 15px rgba(255, 0, 255, 0.2);
+        }
+        
+        .key-button.recording {
+            border-color: #ffff00;
+            color: #ffff00;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* 設定ボタン */
+        .settings-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .settings-button {
+            font-family: 'Rajdhani', monospace;
+            font-weight: 600;
+            padding: 12px 25px;
+            font-size: 16px;
+            border: 2px solid;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 120px;
+        }
+        
+        .settings-button.save {
+            background: linear-gradient(45deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 255, 0.1));
+            border-color: #00ff88;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        }
+        
+        .settings-button.save:hover {
+            border-color: #00ff66;
+            color: #00ff66;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 102, 0.6),
+                inset 0 0 20px rgba(0, 255, 102, 0.2);
+        }
+        
+        .settings-button.cancel {
+            background: linear-gradient(45deg, rgba(255, 102, 102, 0.1), rgba(255, 0, 255, 0.1));
+            border-color: #ff6666;
+            color: #ff6666;
+            text-shadow: 0 0 10px rgba(255, 102, 102, 0.8);
+        }
+        
+        .settings-button.cancel:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+            box-shadow: 
+                0 0 20px rgba(255, 51, 51, 0.6),
+                inset 0 0 20px rgba(255, 51, 51, 0.2);
+        }
+        
+        .settings-button.reset {
+            background: linear-gradient(45deg, rgba(255, 255, 0, 0.1), rgba(255, 153, 0, 0.1));
+            border-color: #ffaa00;
+            color: #ffaa00;
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+        }
+        
+        .settings-button.reset:hover {
+            border-color: #ff9900;
+            color: #ff9900;
+            box-shadow: 
+                0 0 20px rgba(255, 153, 0, 0.6),
+                inset 0 0 20px rgba(255, 153, 0, 0.2);
+        }
+        
+        /* オンライン機能用CSS */
+        #onlineMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            z-index: 3000;
+            font-family: 'Rajdhani', monospace;
+        }
+        
+        .connection-status {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .connection-status.connected {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .connection-status.disconnected {
+            background: rgba(255, 102, 102, 0.2);
+            color: #ff6666;
+            border: 1px solid #ff6666;
+        }
+        
+        .connection-status.connecting {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+        
+        .online-options {
+            margin: 20px 0;
+        }
+        
+        .room-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .room-info {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .room-info h3 {
+            margin: 0 0 10px 0;
+            color: #00ffff;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .room-info p {
+            margin: 5px 0;
+            color: #ccc;
+        }
+        
+        #waitingMessage {
+            color: #ffaa00;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- メニュー画面 -->
+    <div id="menu">
+        <div class="logo-container">
+            <img src="./logo.png" alt="MOTHERLICKED" class="game-logo" id="gameLogo">
+        </div>
+        <div class="menu-subtitle">ULTIMATE COMBAT EXPERIENCE</div>
+        <div class="menu-buttons">
+            <button class="menu-button" id="startButton">ローカル対戦</button>
+            <button class="menu-button" id="onlineButton">オンライン対戦</button>
+            <button class="menu-button" id="controlsButton">操作説明</button>
+            <button class="menu-button" id="nameButton">プレイヤー名設定</button>
+        </div>
+        <div class="menu-controls">
+            <h3>基本操作</h3>
+            <p>P1: AD移動 | W: ジャンプ | F: 攻撃 | G: 銃 | S: 防御 | Q: 必殺</p>
+            <p>P2: ←→移動 | ↑: ジャンプ | J: 攻撃 | K: 銃 | ↓: 防御 | O: 必殺</p>
+        </div>
+    </div>
+    
+    <!-- ゲーム画面 -->
+    <div id="gameContainer">
+        <div id="ui">
+            <div class="playerInfo player1">
+                <div class="playerName">プレイヤー 1</div>
+                <div class="healthBar">
+                    <div class="health" id="health1"></div>
+                </div>
+                <div class="healthValue" id="healthValue1">200</div>
+                <div class="specialBar">
+                    <div class="specialEnergy" id="special1"></div>
+                </div>
+                <div class="chargeBar">
+                    <div class="chargeEnergy" id="charge1"></div>
+                </div>
+            </div>
+            <div class="playerInfo player2">
+                <div class="playerName">プレイヤー 2</div>
+                <div class="healthBar">
+                    <div class="health" id="health2"></div>
+                </div>
+                <div class="healthValue" id="healthValue2">200</div>
+                <div class="specialBar">
+                    <div class="specialEnergy" id="special2"></div>
+                </div>
+                <div class="chargeBar">
+                    <div class="chargeEnergy" id="charge2"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="controls">
+            <div class="playerControls player1Controls">
+                <h3>P1</h3>
+                <div class="controlKeys">
+                    <div class="controlItem">
+                        <span class="key">AD</span>
+                        <span class="keyAction">移動</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">W</span>
+                        <span class="keyAction">ジャンプ</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">F</span>
+                        <span class="keyAction">攻撃</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">G</span>
+                        <span class="keyAction">銃</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">S</span>
+                        <span class="keyAction">防御</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">Q</span>
+                        <span class="keyAction">必殺</span>
+                    </div>
+                </div>
+            </div>
+            <div class="playerControls player2Controls">
+                <h3>P2</h3>
+                <div class="controlKeys">
+                    <div class="controlItem">
+                        <span class="key">←→</span>
+                        <span class="keyAction">移動</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">↑</span>
+                        <span class="keyAction">ジャンプ</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">J</span>
+                        <span class="keyAction">攻撃</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">K</span>
+                        <span class="keyAction">銃</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">↓</span>
+                        <span class="keyAction">防御</span>
+                    </div>
+                    <div class="controlItem">
+                        <span class="key">O</span>
+                        <span class="keyAction">必殺</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- コンボ表示 -->
+        <div id="combo1" class="combo-display player1"></div>
+        <div id="combo2" class="combo-display player2"></div>
+        
+        <div id="winner"></div>
+    </div>
+    
+    <!-- 勝利メニュー -->
+    <div id="victoryMenu">
+        <div class="victory-content">
+            <div class="victory-title" id="victoryTitle">プレイヤー 1 の勝利！</div>
+            <div class="victory-buttons">
+                <button class="victory-button home" id="homeButton">ホームに戻る</button>
+                <button class="victory-button replay" id="replayButton">もう一度プレイ</button>
+            </div>
+            <div style="margin-top: 15px; font-size: 12px; color: #666; font-family: 'Rajdhani', monospace;">
+                Enter/Space: もう一度プレイ | Esc/Backspace: ホームに戻る
+            </div>
+        </div>
+    </div>
+    
+    <!-- プレイヤー名設定メニュー -->
+    <div id="nameSettingsMenu" style="display: none;">
+        <div class="settings-content">
+            <div class="settings-title">プレイヤー名設定</div>
+            <div class="name-inputs">
+                <div class="name-input-group">
+                    <label class="name-label">プレイヤー 1</label>
+                    <input type="text" id="player1Name" class="name-input" maxlength="12" placeholder="プレイヤー 1" />
+                </div>
+                <div class="name-input-group">
+                    <label class="name-label">プレイヤー 2</label>
+                    <input type="text" id="player2Name" class="name-input" maxlength="12" placeholder="プレイヤー 2" />
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button class="settings-button save" id="saveNamesButton">保存</button>
+                <button class="settings-button cancel" id="cancelNamesButton">キャンセル</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 操作設定メニュー -->
+    <div id="controlSettingsMenu" style="display: none;">
+        <div class="settings-content">
+            <div class="settings-title">操作設定</div>
+            <div class="control-settings">
+                <div class="control-player">
+                    <h3>プレイヤー 1</h3>
+                    <div class="control-group">
+                        <span class="control-label">左移動:</span>
+                        <button class="key-button" id="p1-left">A</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">右移動:</span>
+                        <button class="key-button" id="p1-right">D</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">ジャンプ:</span>
+                        <button class="key-button" id="p1-jump">W</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">攻撃:</span>
+                        <button class="key-button" id="p1-attack">F</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">銃:</span>
+                        <button class="key-button" id="p1-gun">G</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">防御:</span>
+                        <button class="key-button" id="p1-defend">S</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">必殺技:</span>
+                        <button class="key-button" id="p1-special">Q</button>
+                    </div>
+                </div>
+                <div class="control-player">
+                    <h3>プレイヤー 2</h3>
+                    <div class="control-group">
+                        <span class="control-label">左移動:</span>
+                        <button class="key-button" id="p2-left">←</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">右移動:</span>
+                        <button class="key-button" id="p2-right">→</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">ジャンプ:</span>
+                        <button class="key-button" id="p2-jump">↑</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">攻撃:</span>
+                        <button class="key-button" id="p2-attack">L</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">銃:</span>
+                        <button class="key-button" id="p2-gun">K</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">防御:</span>
+                        <button class="key-button" id="p2-defend">↓</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">必殺技:</span>
+                        <button class="key-button" id="p2-special">J</button>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button class="settings-button save" id="saveControlsButton">保存</button>
+                <button class="settings-button cancel" id="cancelControlsButton">キャンセル</button>
+                <button class="settings-button reset" id="resetControlsButton">リセット</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- オンライン接続メニュー -->
+    <div id="onlineMenu" style="display: none;">
+        <div class="settings-content">
+            <div class="settings-title">オンライン対戦</div>
+            <div id="connectionStatus" class="connection-status">接続中...</div>
+            <div class="online-options">
+                <div class="room-section">
+                    <label class="name-label">ルームID</label>
+                    <input type="text" id="roomIdInput" class="name-input" placeholder="ルームIDを入力" maxlength="20" />
+                    <button class="settings-button save" id="joinRoomButton">ルーム参加</button>
+                </div>
+                <div class="room-section">
+                    <button class="settings-button save" id="createRoomButton">新規ルーム作成</button>
+                </div>
+                <div class="room-info" id="roomInfo" style="display: none;">
+                    <h3>ルーム情報</h3>
+                    <p>ルームID: <span id="currentRoomId"></span></p>
+                    <p>参加者: <span id="playersInRoom">1/2</span></p>
+                    <p id="waitingMessage">他のプレイヤーを待っています...</p>
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button class="settings-button cancel" id="backToMenuButton">メニューに戻る</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // メニュー制御
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            // ロゴ読み込み処理
+            const gameLogoImg = document.getElementById('gameLogo');
+            if (gameLogoImg) {
+                gameLogoImg.addEventListener('error', function() {
+                    console.log('ロゴ画像の読み込みに失敗しました。フォールバックテキストを表示します。');
+                    const logoContainer = document.querySelector('.logo-container');
+                    logoContainer.innerHTML = '<div class="fallback-title">MOTHERLICKED</div>';
+                    
+                    // フォールバックテキストのスタイルを追加
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .fallback-title {
+                            font-family: 'Orbitron', monospace;
+                            font-size: 64px;
+                            font-weight: 900;
+                            color: #00ffff;
+                            text-shadow: 
+                                0 0 10px #00ffff,
+                                0 0 20px #00ffff,
+                                0 0 30px #ff00ff;
+                            animation: logoGlow 3s ease-in-out infinite alternate;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                });
+                
+                gameLogoImg.addEventListener('load', function() {
+                    console.log('ロゴ画像が正常に読み込まれました');
+                });
+            }
+            
+            // ボタンイベントの設定
+            const startButton = document.getElementById('startButton');
+            const onlineButton = document.getElementById('onlineButton');
+            const controlsButton = document.getElementById('controlsButton');
+            
+            if (startButton) {
+                startButton.addEventListener('click', function() {
+                    console.log('Start button clicked');
+                    isOnlineMode = false;
+                    startGame();
+                });
+            }
+            
+            if (onlineButton) {
+                onlineButton.addEventListener('click', function() {
+                    console.log('Online button clicked');
+                    showOnlineMenu();
+                });
+            }
+            
+            if (controlsButton) {
+                controlsButton.addEventListener('click', function() {
+                    console.log('Controls button clicked');
+                    showControls();
+                });
+            }
+            
+            // オンラインメニューボタンイベント
+            const joinRoomButton = document.getElementById('joinRoomButton');
+            const createRoomButton = document.getElementById('createRoomButton');
+            const backToMenuButton = document.getElementById('backToMenuButton');
+            
+            if (joinRoomButton) {
+                joinRoomButton.addEventListener('click', joinRoom);
+            }
+            
+            if (createRoomButton) {
+                createRoomButton.addEventListener('click', createRoom);
+            }
+            
+            if (backToMenuButton) {
+                backToMenuButton.addEventListener('click', function() {
+                    hideOnlineMenu();
+                    document.getElementById('menu').style.display = 'flex';
+                });
+            }
+            
+            // 勝利メニューボタンイベント
+            const homeButton = document.getElementById('homeButton');
+            const replayButton = document.getElementById('replayButton');
+            const nameButton = document.getElementById('nameButton');
+            
+            if (homeButton) {
+                homeButton.addEventListener('click', function() {
+                    console.log('Home button clicked');
+                    returnToMenu();
+                });
+            }
+            
+            if (replayButton) {
+                replayButton.addEventListener('click', function() {
+                    console.log('Replay button clicked');
+                    restartGame();
+                });
+            }
+            
+            if (nameButton) {
+                nameButton.addEventListener('click', function() {
+                    console.log('Name button clicked');
+                    showNameSettings();
+                });
+            }
+            
+            // キーボードイベント
+            document.addEventListener('keydown', function(e) {
+                if (gameState === 'menu' && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    startGame();
+                } else if (gameState === 'victory') {
+                    // 勝利メニューでのキー操作
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        restartGame(); // スペースまたはエンターで再プレイ
+                    } else if (e.key === 'Escape' || e.key === 'Backspace') {
+                        e.preventDefault();
+                        returnToMenu(); // エスケープまたはバックスペースでホームに戻る
+                    }
+                }
+            });
+        });
+        
+        // ゲーム状態管理
+        let gameState = 'menu';
+        let gameInitialized = false;
+        let scene, camera, renderer;
+        let player1, player2;
+        let bullets = [];
+        let particles = [];
+        let animationRunning = false;
+        let lastTime = 0;
+        
+        // エフェクトシステム用グローバル変数
+        let gameSpeed = 1.0;
+        let screenShake = { intensity: 0, duration: 0 };
+        
+        // プレイヤー名設定
+        let playerNames = {
+            player1: 'プレイヤー 1',
+            player2: 'プレイヤー 2'
+        };
+        
+        // 操作設定
+        let controls = {
+            player1: {
+                left: 'KeyA',
+                right: 'KeyD', 
+                jump: 'KeyW',
+                attack: 'KeyF',
+                gun: 'KeyG',
+                defend: 'KeyS',
+                special: 'KeyQ'
+            },
+            player2: {
+                left: 'ArrowLeft',
+                right: 'ArrowRight',
+                jump: 'ArrowUp', 
+                attack: 'KeyL',
+                gun: 'KeyK',
+                defend: 'ArrowDown',
+                special: 'KeyJ'
+            }
+        };
+        
+        // 効果音システム
+        let soundEnabled = true;
+        let soundVolume = 0.5;
+        let audioContext = null;
+        
+        // オンライン機能
+        let socket = null;
+        let isOnlineMode = false;
+        let myPlayerNumber = null;
+        let roomId = null;
+        let isConnected = false;
+        let frameCount = 0;
+        
+        // 効果音生成関数
+        function playSound(type, frequency = 440, duration = 0.2, volume = 0.3) {
+            if (!soundEnabled) return;
+            
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(volume * soundVolume, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                switch(type) {
+                    case 'hit':
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+                        break;
+                    case 'sword':
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.15);
+                        break;
+                    case 'gun':
+                        oscillator.type = 'triangle';
+                        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.05);
+                        break;
+                    case 'defend':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                        break;
+                    case 'ultimate':
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.3);
+                        break;
+                    case 'jump':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.1);
+                        break;
+                    case 'victory':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(523, audioContext.currentTime);
+                        oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.2);
+                        oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.4);
+                        break;
+                }
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+                
+            } catch (error) {
+                console.log('音声再生エラー:', error);
+            }
+        }
+        let damageNumbers = [];
+        
+        // Socket.IO初期化と接続
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                console.log('サーバーに接続しました');
+                isConnected = true;
+                updateConnectionStatus('connected');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('サーバーから切断されました');
+                isConnected = false;
+                updateConnectionStatus('disconnected');
+            });
+            
+            socket.on('playerAssigned', (data) => {
+                myPlayerNumber = data.playerNumber;
+                roomId = data.roomId;
+                console.log(`プレイヤー ${myPlayerNumber} として参加, ルーム: ${roomId}`);
+                showRoomInfo();
+            });
+            
+            socket.on('roomUpdate', (data) => {
+                updateRoomDisplay(data);
+            });
+            
+            socket.on('gameStart', () => {
+                console.log('ゲーム開始!');
+                hideOnlineMenu();
+                isOnlineMode = true;
+                startGame();
+            });
+            
+            socket.on('playerStateUpdate', (data) => {
+                if (isOnlineMode && data.playerNumber !== myPlayerNumber) {
+                    updateRemotePlayer(data);
+                }
+            });
+            
+            socket.on('playerAttack', (data) => {
+                if (isOnlineMode && data.playerNumber !== myPlayerNumber) {
+                    handleRemoteAttack(data);
+                }
+            });
+            
+            socket.on('playerDamage', (data) => {
+                if (isOnlineMode && data.playerNumber !== myPlayerNumber) {
+                    handleRemoteDamage(data);
+                }
+            });
+            
+            socket.on('roomFull', () => {
+                alert('ルームが満員です');
+            });
+            
+            socket.on('playerDisconnected', (playerNumber) => {
+                alert(`プレイヤー ${playerNumber} が切断されました`);
+                backToMenu();
+            });
+        }
+        
+        // 接続状態表示更新
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.className = `connection-status ${status}`;
+            
+            switch(status) {
+                case 'connected':
+                    statusElement.textContent = '✓ サーバーに接続済み';
+                    break;
+                case 'disconnected':
+                    statusElement.textContent = '✗ サーバーから切断';
+                    break;
+                case 'connecting':
+                    statusElement.textContent = '⟳ 接続中...';
+                    break;
+            }
+        }
+        
+        // ルーム情報表示
+        function showRoomInfo() {
+            document.getElementById('roomInfo').style.display = 'block';
+            document.getElementById('currentRoomId').textContent = roomId;
+        }
+        
+        // ルーム表示更新
+        function updateRoomDisplay(data) {
+            const playersInRoom = document.getElementById('playersInRoom');
+            const waitingMessage = document.getElementById('waitingMessage');
+            
+            playersInRoom.textContent = `${data.players.length}/2`;
+            
+            if (data.players.length === 2) {
+                waitingMessage.textContent = 'ゲーム開始準備完了!';
+                waitingMessage.style.color = '#00ff88';
+            } else {
+                waitingMessage.textContent = '他のプレイヤーを待っています...';
+                waitingMessage.style.color = '#ffaa00';
+            }
+        }
+        
+        // オンラインメニュー表示
+        function showOnlineMenu() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('onlineMenu').style.display = 'flex';
+            
+            if (!socket) {
+                initializeSocket();
+            }
+        }
+        
+        // オンラインメニュー非表示
+        function hideOnlineMenu() {
+            document.getElementById('onlineMenu').style.display = 'none';
+        }
+        
+        // ルーム作成
+        function createRoom() {
+            if (!isConnected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            const newRoomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            socket.emit('joinRoom', newRoomId);
+        }
+        
+        // ルーム参加
+        function joinRoom() {
+            const roomIdInput = document.getElementById('roomIdInput');
+            const inputRoomId = roomIdInput.value.trim().toUpperCase();
+            
+            if (!inputRoomId) {
+                alert('ルームIDを入力してください');
+                return;
+            }
+            
+            if (!isConnected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            socket.emit('joinRoom', inputRoomId);
+        }
+        
+        // リモートプレイヤー更新
+        function updateRemotePlayer(data) {
+            const remotePlayer = myPlayerNumber === 1 ? player2 : player1;
+            if (remotePlayer && data.state) {
+                remotePlayer.mesh.position.copy(data.state.position);
+                remotePlayer.velocity.copy(data.state.velocity);
+                remotePlayer.health = data.state.health;
+                remotePlayer.isDefending = data.state.isDefending;
+                remotePlayer.updateHealthBar();
+            }
+        }
+        
+        // リモート攻撃処理
+        function handleRemoteAttack(data) {
+            const remotePlayer = myPlayerNumber === 1 ? player2 : player1;
+            const localPlayer = myPlayerNumber === 1 ? player1 : player2;
+            
+            if (remotePlayer && data.attackData) {
+                // 攻撃エフェクトを表示
+                if (data.attackData.type === 'sword') {
+                    remotePlayer.sword.visible = true;
+                    remotePlayer.attackCooldown = 0.3;
+                    
+                    // 剣のスパークエフェクト
+                    for (let i = 0; i < 8; i++) {
+                        const velocity = new THREE.Vector3(
+                            (Math.random() - 0.5) * 12,
+                            Math.random() * 8 + 2,
+                            (Math.random() - 0.5) * 12
+                        );
+                        createSpark(remotePlayer.mesh.position.clone(), 0xff6600, velocity, 0.4);
+                    }
+                    
+                    playSound('sword');
+                }
+                
+                if (data.attackData.type === 'gun') {
+                    // 銃弾エフェクト
+                    playSound('gun');
+                }
+                
+                if (data.attackData.type === 'ultimate') {
+                    createUltimateEffect(remotePlayer.mesh.position, remotePlayer.color);
+                    playSound('ultimate');
+                }
+            }
+        }
+        
+        // リモートダメージ処理
+        function handleRemoteDamage(data) {
+            const localPlayer = myPlayerNumber === 1 ? player1 : player2;
+            
+            if (localPlayer && data.damageData) {
+                localPlayer.takeDamage(
+                    data.damageData.amount, 
+                    data.damageData.attackerPosition, 
+                    null
+                );
+                
+                createHitEffect(
+                    localPlayer.mesh.position, 
+                    localPlayer.isDefending, 
+                    data.damageData.attackType, 
+                    data.damageData.amount
+                );
+                
+                playSound('hit');
+            }
+        }
+        
+        // プレイヤー状態を送信
+        function sendPlayerState() {
+            if (isOnlineMode && socket && isConnected) {
+                const localPlayer = myPlayerNumber === 1 ? player1 : player2;
+                if (localPlayer) {
+                    const state = {
+                        position: localPlayer.mesh.position,
+                        velocity: localPlayer.velocity,
+                        health: localPlayer.health,
+                        isDefending: localPlayer.isDefending,
+                        specialGauge: localPlayer.specialGauge
+                    };
+                    
+                    socket.emit('playerState', state);
+                }
+            }
+        }
+        
+        // 攻撃を送信
+        function sendAttack(attackType, attackData = {}) {
+            if (isOnlineMode && socket && isConnected) {
+                socket.emit('attack', {
+                    type: attackType,
+                    ...attackData
+                });
+            }
+        }
+        
+        // ダメージを送信
+        function sendDamage(damageData) {
+            if (isOnlineMode && socket && isConnected) {
+                socket.emit('damage', damageData);
+            }
+        }
+        
+        // メニューに戻る
+        function backToMenu() {
+            gameState = 'menu';
+            isOnlineMode = false;
+            myPlayerNumber = null;
+            roomId = null;
+            
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            
+            hideAllMenus();
+            document.getElementById('menu').style.display = 'flex';
+            document.getElementById('gameContainer').style.display = 'none';
+        }
+        
+        // 全メニューを隠す
+        function hideAllMenus() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('onlineMenu').style.display = 'none';
+            document.getElementById('nameSettingsMenu').style.display = 'none';
+            document.getElementById('controlSettingsMenu').style.display = 'none';
+            document.getElementById('victoryMenu').style.display = 'none';
+        }
+        
+        // 入力管理
+        const keys = {};
+        const keyState = {
+            player1Attack: false,
+            player2Attack: false,
+            player1Gun: false,
+            player2Gun: false,
+            player1Jump: false,
+            player2Jump: false,
+            player1Ultimate: false,
+            player2Ultimate: false,
+            player1GunHoldTimer: null,
+            player2GunHoldTimer: null
+        };
+        
+        function startGame() {
+            console.log('Starting game...');
+            
+            if (!gameInitialized) {
+                initializeGame();
+            }
+            
+            gameState = 'playing';
+            
+            // メニューを非表示
+            document.getElementById('menu').style.display = 'none';
+            
+            // ゲーム画面を表示
+            document.getElementById('gameContainer').style.display = 'block';
+            
+            // プレイヤーの状態をリセット
+            resetPlayers();
+            
+            // 月が存在しない場合は再作成
+            if (!moon) {
+                createMoon();
+            }
+            
+            // ゲームループ開始
+            if (!animationRunning) {
+                animate(performance.now());
+            }
+        }
+        
+        function showControls() {
+            alert('操作説明:\\n\\nP1: AD移動 | Wジャンプ | F攻撃 | G銃 | S防御 | Q必殺\\nP2: ←→移動 | ↑ジャンプ | J攻撃 | K銃 | ↓防御 | O必殺\\n\\n銃とジャンプは連打または長押しチャージが可能です。\\n攻撃も長押しでチャージ攻撃ができます。');
+        }
+        
+        // 弾丸システム
+        function updateBullets(deltaTime) {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                bullet.mesh.position.add(bullet.velocity.clone().multiplyScalar(deltaTime));
+                
+                // チャージ弾の回転
+                if (bullet.isCharged) {
+                    bullet.mesh.rotation.x += deltaTime * 10;
+                    bullet.mesh.rotation.y += deltaTime * 10;
+                }
+                
+                // 相手プレイヤーとの衝突判定
+                const opponent = bullet.owner.isPlayer1 ? player2 : player1;
+                const distance = bullet.mesh.position.distanceTo(opponent.mesh.position);
+                
+                if (distance < 2.5) {
+                    console.log(`🔫 銃弾ヒット: ダメージ=${bullet.damage}, チャージ=${bullet.isCharged}, 距離=${distance.toFixed(2)}`);
+                    
+                    // オンラインモードでダメージをブロードキャスト
+                    if (isOnlineMode) {
+                        sendDamage({
+                            damage: bullet.damage,
+                            type: 'gun',
+                            targetPlayer: opponent.isPlayer1 ? 1 : 2,
+                            attackerPos: bullet.owner.mesh.position.clone(),
+                            isCharged: bullet.isCharged
+                        });
+                    }
+                    
+                    // 弾丸のダメージとノックバック
+                    opponent.takeDamage(bullet.damage, bullet.owner.mesh.position, bullet.owner);
+                    
+                    createHitEffect(opponent.mesh.position, opponent.isDefending, 'gun', bullet.damage);
+                    
+                    if (bullet.isCharged) {
+                        createUltimateEffect(opponent.mesh.position, 0xffff00);
+                    }
+                    
+                    scene.remove(bullet.mesh);
+                    bullets.splice(i, 1);
+                    
+                    // 必殺技ゲージ増加
+                    bullet.owner.specialGauge = Math.min(100, bullet.owner.specialGauge + (bullet.isCharged ? 20 : 10));
+                    bullet.owner.updateSpecialBar();
+                    continue;
+                }
+                
+                // 画面外削除
+                if (Math.abs(bullet.mesh.position.x) > 30) {
+                    scene.remove(bullet.mesh);
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+        
+        function returnToMenu() {
+            gameState = 'menu';
+            animationRunning = false;
+            
+            // 勝利メニューを非表示
+            hideVictoryMenu();
+            
+            // ゲーム画面を非表示
+            document.getElementById('gameContainer').style.display = 'none';
+            
+            // メニューを表示
+            document.getElementById('menu').style.display = 'flex';
+        }
+        
+        function initializeGame() {
+            console.log('Initializing game...');
+            
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x000000, 10, 100);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 30);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('gameContainer').appendChild(renderer.domElement);
+            
+            // ライティング
+            const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(10, 20, 10);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -30;
+            directionalLight.shadow.camera.right = 30;
+            directionalLight.shadow.camera.top = 30;
+            directionalLight.shadow.camera.bottom = -30;
+            scene.add(directionalLight);
+            
+            // 宇宙背景の作成
+            createSpaceBackground();
+            
+            // 月の作成
+            createMoon();
+            
+            // ステージ作成
+            const stageGeometry = new THREE.BoxGeometry(40, 2, 20);
+            const stageMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x222222,
+                emissive: 0x111111,
+                shininess: 100
+            });
+            const stage = new THREE.Mesh(stageGeometry, stageMaterial);
+            stage.position.y = -1;
+            stage.receiveShadow = true;
+            scene.add(stage);
+            
+            // ステージの縁に光るライン
+            const edgeGeometry = new THREE.EdgesGeometry(stageGeometry);
+            const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff });
+            const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            stage.add(edges);
+            
+            // プレイヤー作成
+            player1 = new Player(0x3366ff, -10, true);
+            player2 = new Player(0xff3366, 10, false);
+            
+            gameInitialized = true;
+            console.log('Game initialized');
+        }
+        
+        function resetPlayers() {
+            player1.health = 200;
+            player1.damage = 0;
+            player1.specialGauge = 0;
+            player1.isDefending = false;
+            player1.defendStun = 0;
+            player1.wasDefending = false;
+            player1.shield.visible = false;
+            player1.isJumpCharging = false;
+            player1.jumpChargeTime = 0;
+            player1.jumpRapidFire = false;
+            player1.knockbackTimer = 0;
+            player1.comboCount = 0;
+            player1.comboTimer = 0;
+            player1.mesh.position.set(-10, 2, 0);
+            player1.mesh.visible = true;
+            player1.velocity.set(0, 0, 0);
+            
+            player2.health = 200;
+            player2.damage = 0;
+            player2.specialGauge = 0;
+            player2.isDefending = false;
+            player2.defendStun = 0;
+            player2.wasDefending = false;
+            player2.shield.visible = false;
+            player2.isJumpCharging = false;
+            player2.jumpChargeTime = 0;
+            player2.jumpRapidFire = false;
+            player2.knockbackTimer = 0;
+            player2.comboCount = 0;
+            player2.comboTimer = 0;
+            player2.mesh.position.set(10, 2, 0);
+            player2.mesh.visible = true;
+            player2.velocity.set(0, 0, 0);
+            
+            // UI更新
+            player1.updateHealthBar();
+            player2.updateHealthBar();
+            player1.updateHealthDisplay();
+            player2.updateHealthDisplay();
+            player1.updateSpecialBar();
+            player2.updateSpecialBar();
+            player1.updateChargeBar();
+            player2.updateChargeBar();
+            player1.updateComboDisplay();
+            player2.updateComboDisplay();
+            
+            // プレイヤー名表示を更新
+            updatePlayerNames();
+            
+            // ダメージ表示をクリア
+            damageNumbers = [];
+            
+            // エフェクトをリセット
+            gameSpeed = 1.0;
+            screenShake = { intensity: 0, duration: 0 };
+            
+            // 勝者表示を非表示
+            document.getElementById('winner').style.display = 'none';
+        }
+        
+        // パーティクルシステム
+        function createParticle(position, color, size, velocity, lifetime) {
+            const geometry = new THREE.SphereGeometry(size, 8, 8);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1
+            });
+            const particle = new THREE.Mesh(geometry, material);
+            particle.position.copy(position);
+            
+            const particleData = {
+                mesh: particle,
+                velocity: velocity,
+                lifetime: lifetime,
+                maxLifetime: lifetime,
+                material: material
+            };
+            
+            scene.add(particle);
+            particles.push(particleData);
+            
+            return particleData;
+        }
+        
+        function updateParticles(deltaTime) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                particle.lifetime -= deltaTime;
+                
+                if (particle.lifetime <= 0) {
+                    scene.remove(particle.mesh);
+                    particles.splice(i, 1);
+                    continue;
+                }
+                
+                particle.mesh.position.add(particle.velocity.clone().multiplyScalar(deltaTime));
+                particle.velocity.y -= 15 * deltaTime; // 重力
+                particle.material.opacity = particle.lifetime / particle.maxLifetime;
+            }
+        }
+        
+        // 3D星形ジオメトリ作成関数
+        function createStarGeometry(outerRadius = 1, innerRadius = 0.4, points = 5) {
+            const shape = new THREE.Shape();
+            
+            // 星形のパスを作成
+            for (let i = 0; i <= points * 2; i++) {
+                const angle = (i / (points * 2)) * Math.PI * 2;
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                if (i === 0) {
+                    shape.moveTo(x, y);
+                } else {
+                    shape.lineTo(x, y);
+                }
+            }
+            
+            // ExtrudeGeometryで3D化
+            const extrudeSettings = {
+                depth: 0.1,
+                bevelEnabled: true,
+                bevelSize: 0.02,
+                bevelSegments: 2,
+                bevelThickness: 0.05
+            };
+            
+            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        }
+        
+        // 3D星空作成関数
+        function create3DStars() {
+            const starCount = 150; // 数を少し減らして負荷軽減
+            
+            for (let i = 0; i < starCount; i++) {
+                // ランダムなサイズの星形を作成
+                const size = Math.random() * 0.3 + 0.1;
+                const starGeometry = createStarGeometry(size, size * 0.4, 5);
+                
+                // 星の材質（光る効果）
+                const colors = [0xffffff, 0xffffcc, 0xccffff, 0xffccff, 0xccffcc];
+                const starColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const starMaterial = new THREE.MeshPhongMaterial({ 
+                    color: starColor,
+                    emissive: starColor,
+                    emissiveIntensity: Math.random() * 0.3 + 0.2,
+                    transparent: true,
+                    opacity: Math.random() * 0.6 + 0.4
+                });
+                
+                const star = new THREE.Mesh(starGeometry, starMaterial);
+                
+                // ランダムな位置に配置
+                star.position.set(
+                    (Math.random() - 0.5) * 200, // x
+                    (Math.random() - 0.5) * 100 + 20, // y
+                    (Math.random() - 0.5) * 200 // z
+                );
+                
+                // ランダムな回転
+                star.rotation.set(
+                    Math.random() * Math.PI * 2,
+                    Math.random() * Math.PI * 2,
+                    Math.random() * Math.PI * 2
+                );
+                
+                // ランダムなスケール
+                const scale = Math.random() * 0.8 + 0.3;
+                star.scale.setScalar(scale);
+                
+                // 微細な回転アニメーション用データ
+                star.userData = { 
+                    rotationSpeed: (Math.random() - 0.5) * 0.02,
+                    twinkleSpeed: Math.random() * 0.05 + 0.02,
+                    originalEmissiveIntensity: starMaterial.emissiveIntensity
+                };
+                
+                scene.add(star);
+            }
+        }
+        
+        // 画像背景作成関数
+        function createImageBackground() {
+            // テクスチャローダー
+            const textureLoader = new THREE.TextureLoader();
+            
+            // 背景画像を読み込み
+            textureLoader.load('./background.png', 
+                function(texture) {
+                    // 背景スカイボックスの作成
+                    const skyGeometry = new THREE.SphereGeometry(200, 32, 32);
+                    const skyMaterial = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        side: THREE.BackSide // 内側から見えるように
+                    });
+                    const skybox = new THREE.Mesh(skyGeometry, skyMaterial);
+                    skybox.position.set(0, 0, 0);
+                    scene.add(skybox);
+                    
+                    console.log('背景画像が正常に読み込まれました');
+                },
+                function(progress) {
+                    console.log('背景画像読み込み中...', (progress.loaded / progress.total * 100) + '%');
+                },
+                function(error) {
+                    console.error('背景画像の読み込みに失敗しました:', error);
+                    // フォールバック: グラデーション背景
+                    createFallbackBackground();
+                }
+            );
+        }
+        
+        // フォールバック背景（画像読み込み失敗時）
+        function createFallbackBackground() {
+            // 空のようなグラデーション背景
+            const skyGeometry = new THREE.SphereGeometry(200, 32, 32);
+            
+            // グラデーション風のマテリアル
+            const skyMaterial = new THREE.MeshBasicMaterial({
+                color: 0x87CEEB, // スカイブルー
+                side: THREE.BackSide
+            });
+            
+            const skybox = new THREE.Mesh(skyGeometry, skyMaterial);
+            scene.add(skybox);
+            
+            // 雲のような装飾を追加
+            for (let i = 0; i < 10; i++) {
+                const cloudGeometry = new THREE.SphereGeometry(Math.random() * 10 + 5, 8, 8);
+                const cloudMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+                
+                cloud.position.set(
+                    (Math.random() - 0.5) * 300,
+                    Math.random() * 80 + 20,
+                    (Math.random() - 0.5) * 300
+                );
+                
+                cloud.scale.set(
+                    Math.random() * 2 + 1,
+                    Math.random() * 0.5 + 0.3,
+                    Math.random() * 2 + 1
+                );
+                
+                scene.add(cloud);
+            }
+        }
+        
+        // 背景作成関数
+        function createSpaceBackground() {
+            // 背景画像の設定
+            createImageBackground();
+        }
+        
+        // 背景のアニメーション更新
+        function updateSpaceBackground() {
+            // 必要に応じて背景アニメーションを追加
+            // 現在は静的な背景画像を使用
+        }
+        
+        // 月のオブジェクト作成
+        let moon = null;
+        let moonRotationSpeed = 0.01;
+        
+        function createMoon() {
+            // 月のジオメトリ（球体）
+            const moonGeometry = new THREE.SphereGeometry(8, 32, 32);
+            
+            // 月のマテリアル（クレーターのような表面）
+            const moonMaterial = new THREE.MeshPhongMaterial({
+                color: 0xCCCCCC,
+                emissive: 0x222222,
+                shininess: 5,
+                bumpScale: 0.3
+            });
+            
+            // クレーターテクスチャを手動で作成
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const context = canvas.getContext('2d');
+            
+            // ベース色
+            context.fillStyle = '#CCCCCC';
+            context.fillRect(0, 0, 512, 512);
+            
+            // クレーターを描画
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const radius = Math.random() * 30 + 5;
+                
+                const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+                gradient.addColorStop(0, '#999999');
+                gradient.addColorStop(0.7, '#AAAAAA');
+                gradient.addColorStop(1, '#CCCCCC');
+                
+                context.fillStyle = gradient;
+                context.beginPath();
+                context.arc(x, y, radius, 0, Math.PI * 2);
+                context.fill();
+            }
+            
+            const moonTexture = new THREE.CanvasTexture(canvas);
+            moonMaterial.map = moonTexture;
+            moonMaterial.bumpMap = moonTexture;
+            
+            moon = new THREE.Mesh(moonGeometry, moonMaterial);
+            moon.position.set(0, 25, -80); // 背景の遠くに配置
+            moon.castShadow = false;
+            moon.receiveShadow = false;
+            scene.add(moon);
+            
+            console.log('月が作成されました');
+        }
+        
+        // 月のアニメーション更新
+        function updateMoon() {
+            if (moon) {
+                // 月を回転させる
+                moon.rotation.y += moonRotationSpeed;
+                moon.rotation.x += moonRotationSpeed * 0.3;
+            }
+        }
+        
+        // 月の爆発エフェクト
+        function explodeMoon() {
+            if (!moon) return;
+            
+            console.log('月が爆発します！');
+            
+            // 月の位置を記録
+            const moonPosition = moon.position.clone();
+            
+            // 月を削除
+            scene.remove(moon);
+            
+            // 巨大爆発エフェクト
+            createMoonExplosion(moonPosition);
+        }
+        
+        // 月爆発エフェクト
+        function createMoonExplosion(position) {
+            // 超巨大フラッシュ
+            const flashGeometry = new THREE.SphereGeometry(15, 20, 20);
+            const flashMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xFFFFFF,
+                transparent: true,
+                opacity: 1,
+                emissive: 0xFFFFFF,
+                emissiveIntensity: 5.0
+            });
+            const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+            flash.position.copy(position);
+            scene.add(flash);
+            
+            let flashScale = 0.1;
+            const expandFlash = () => {
+                flashScale += 3.0;
+                flash.scale.setScalar(flashScale);
+                flashMaterial.opacity *= 0.9;
+                flashMaterial.emissiveIntensity *= 0.95;
+                if (flashMaterial.opacity > 0.01) {
+                    requestAnimationFrame(expandFlash);
+                } else {
+                    scene.remove(flash);
+                }
+            };
+            expandFlash();
+            
+            // 月の破片スパーク（灰色と白）
+            for (let i = 0; i < 200; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 60,
+                    Math.random() * 40 + 10,
+                    (Math.random() - 0.5) * 60
+                );
+                const fragmentColor = Math.random() > 0.5 ? 0xCCCCCC : 0xFFFFFF;
+                createMoonFragment(position.clone(), fragmentColor, velocity);
+            }
+            
+            // エネルギー爆発（オレンジと黄色）
+            for (let i = 0; i < 150; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 50,
+                    Math.random() * 35 + 5,
+                    (Math.random() - 0.5) * 50
+                );
+                const energyColor = Math.random() > 0.5 ? 0xFF6600 : 0xFFFF00;
+                createMegaSpark(position.clone(), energyColor, velocity, 2.0);
+            }
+            
+            // 遅延爆発
+            setTimeout(() => {
+                for (let i = 0; i < 100; i++) {
+                    const velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 40,
+                        Math.random() * 30,
+                        (Math.random() - 0.5) * 40
+                    );
+                    createMoonFragment(position.clone(), 0x888888, velocity);
+                }
+            }, 300);
+        }
+        
+        // 月の破片エフェクト
+        function createMoonFragment(position, color, velocity) {
+            const fragmentGeometry = new THREE.SphereGeometry(0.15, 6, 6);
+            const fragmentMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 0.3
+            });
+            const fragment = new THREE.Mesh(fragmentGeometry, fragmentMaterial);
+            fragment.position.copy(position);
+            scene.add(fragment);
+            
+            let lifeTime = 0;
+            const maxLife = 4.0;
+            
+            const animateFragment = () => {
+                fragment.position.add(velocity.clone().multiplyScalar(0.15));
+                velocity.y -= 0.8; // 重力
+                velocity.multiplyScalar(0.98); // 減衰
+                
+                // 回転
+                fragment.rotation.x += 0.1;
+                fragment.rotation.y += 0.15;
+                
+                lifeTime += 0.05;
+                fragmentMaterial.opacity = 1 - (lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && fragment.parent) {
+                    requestAnimationFrame(animateFragment);
+                } else {
+                    if (fragment.parent) scene.remove(fragment);
+                }
+            };
+            animateFragment();
+        }
+        
+        // 強化されたヒットエフェクト関数
+        function createHitEffect(position, isBlocked = false, attackType = 'normal', damage = 10) {
+            console.log('createHitEffect called:', position, isBlocked, attackType, damage);
+            
+            const color = isBlocked ? 0x00ffff : 0xff6600;
+            
+            if (isBlocked) {
+                // 防御時の特殊エフェクト
+                createDefenseEffect(position, damage);
+            } else {
+                // 通常ヒット時の強化エフェクト
+                createAttackHitEffect(position, attackType, damage);
+            }
+        }
+        
+        // 防御エフェクト
+        function createDefenseEffect(position, damage = 10) {
+            // ダメージに応じてエフェクトサイズを調整
+            const sizeMultiplier = Math.min(1 + damage / 50, 2.5); // 最大2.5倍
+            
+            // 青いエネルギーシールド
+            const shieldGeometry = new THREE.SphereGeometry(1.0 * sizeMultiplier, 16, 16);
+            const shieldMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.7,
+                emissive: 0x00ffff,
+                emissiveIntensity: 1.0
+            });
+            const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
+            shield.position.copy(position);
+            scene.add(shield);
+            
+            let shieldScale = 0.5;
+            const animateShield = () => {
+                shieldScale += 0.15;
+                shield.scale.setScalar(shieldScale);
+                shieldMaterial.opacity *= 0.9;
+                shieldMaterial.emissiveIntensity *= 0.95;
+                
+                if (shieldMaterial.opacity > 0.05) {
+                    requestAnimationFrame(animateShield);
+                } else {
+                    scene.remove(shield);
+                }
+            };
+            animateShield();
+            
+            // 青いスパーク（ダメージに応じて数とサイズ調整）
+            const sparkCount = Math.min(10 + Math.floor(damage / 5), 25);
+            const sparkScale = Math.min(0.8 + damage / 100, 1.5);
+            
+            for (let i = 0; i < sparkCount; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 12,
+                    Math.random() * 10 + 3,
+                    (Math.random() - 0.5) * 12
+                );
+                createScaledSpark(position.clone(), 0x00ffff, velocity, 0.8, sparkScale);
+            }
+            
+            // 電気エフェクト
+            const electricCount = Math.min(5 + Math.floor(damage / 10), 12);
+            for (let i = 0; i < electricCount; i++) {
+                setTimeout(() => {
+                    createElectricSpark(position);
+                }, i * 50);
+            }
+        }
+        
+        // 攻撃ヒットエフェクト
+        function createAttackHitEffect(position, attackType = 'normal', damage = 10) {
+            // 攻撃タイプとダメージに応じてエフェクトサイズを調整
+            let sizeMultiplier = 1.0;
+            let sparkCount = 20;
+            let bloodCount = 15;
+            
+            switch(attackType) {
+                case 'sword':
+                    sizeMultiplier = 1.2 + damage / 100; // 剣攻撃
+                    sparkCount = 25 + Math.floor(damage / 4);
+                    bloodCount = 20 + Math.floor(damage / 5);
+                    break;
+                case 'gun':
+                    sizeMultiplier = 0.8 + damage / 150; // 銃攻撃
+                    sparkCount = 15 + Math.floor(damage / 6);
+                    bloodCount = 10 + Math.floor(damage / 8);
+                    break;
+                case 'ultimate':
+                    sizeMultiplier = 2.0 + damage / 50; // 必殺技
+                    sparkCount = 50 + Math.floor(damage / 2);
+                    bloodCount = 40 + Math.floor(damage / 3);
+                    break;
+                default: // normal attack
+                    sizeMultiplier = 1.0 + damage / 120;
+                    sparkCount = 20 + Math.floor(damage / 5);
+                    bloodCount = 15 + Math.floor(damage / 6);
+            }
+            
+            // 最大値制限
+            sizeMultiplier = Math.min(sizeMultiplier, 3.0);
+            sparkCount = Math.min(sparkCount, 80);
+            bloodCount = Math.min(bloodCount, 60);
+            
+            // 爆発フラッシュ
+            const flashGeometry = new THREE.SphereGeometry(2.5 * sizeMultiplier, 16, 16);
+            const flashMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff6600,
+                transparent: true,
+                opacity: 1,
+                emissive: 0xff6600,
+                emissiveIntensity: 2.5
+            });
+            const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+            flash.position.copy(position);
+            scene.add(flash);
+            
+            let flashTime = 0;
+            const animateFlash = () => {
+                flashTime += 0.08;
+                flash.scale.setScalar(1 + flashTime * 2.5);
+                flashMaterial.opacity = Math.max(0, 1 - flashTime * 2.5);
+                flashMaterial.emissiveIntensity = 2.5 * (1 - flashTime);
+                
+                if (flashMaterial.opacity > 0.01) {
+                    requestAnimationFrame(animateFlash);
+                } else {
+                    scene.remove(flash);
+                }
+            };
+            animateFlash();
+            
+            // オレンジ/黄色スパーク爆発
+            for (let i = 0; i < sparkCount; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 18,
+                    Math.random() * 12 + 4,
+                    (Math.random() - 0.5) * 18
+                );
+                const sparkColor = Math.random() > 0.5 ? 0xff6600 : 0xffff00;
+                createScaledSpark(position.clone(), sparkColor, velocity, 1.0, sizeMultiplier * 0.8);
+            }
+            
+            // 血のスパーク爆発
+            for (let i = 0; i < bloodCount; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 16,
+                    Math.random() * 10 + 3,
+                    (Math.random() - 0.5) * 16
+                );
+                createScaledBloodSpark(position.clone(), velocity, sizeMultiplier * 0.7);
+            }
+            
+            // 二次爆発（強い攻撃のみ）
+            if (damage >= 20 || attackType === 'ultimate') {
+                setTimeout(() => {
+                    const secondaryCount = Math.floor(sparkCount * 0.4);
+                    for (let i = 0; i < secondaryCount; i++) {
+                        const velocity = new THREE.Vector3(
+                            (Math.random() - 0.5) * 12,
+                            Math.random() * 8 + 2,
+                            (Math.random() - 0.5) * 12
+                        );
+                        const sparkColor = Math.random() > 0.6 ? 0xffffff : 0xffaa00;
+                        createScaledSpark(position.clone(), sparkColor, velocity, 0.8, sizeMultiplier * 0.6);
+                    }
+                }, 150);
+            }
+            
+            // 衝撃波エフェクト
+            createScaledImpactWave(position, sizeMultiplier);
+        }
+        
+        // 電気スパークエフェクト
+        function createElectricSpark(position) {
+            const sparkGeometry = new THREE.SphereGeometry(0.03, 6, 6);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x88ffff,
+                transparent: true,
+                opacity: 1,
+                emissive: 0x88ffff,
+                emissiveIntensity: 2.0
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            spark.position.add(new THREE.Vector3(
+                (Math.random() - 0.5) * 3,
+                (Math.random() - 0.5) * 3,
+                (Math.random() - 0.5) * 3
+            ));
+            scene.add(spark);
+            
+            let life = 0;
+            const animateElectric = () => {
+                life += 0.1;
+                sparkMaterial.opacity = Math.max(0, 1 - life * 2);
+                sparkMaterial.emissiveIntensity = 2.0 * (1 - life);
+                
+                if (life < 0.5) {
+                    requestAnimationFrame(animateElectric);
+                } else {
+                    scene.remove(spark);
+                }
+            };
+            animateElectric();
+        }
+        
+        // 衝撃波エフェクト
+        function createImpactWave(position) {
+            const waveGeometry = new THREE.RingGeometry(0.1, 3, 16);
+            const waveMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff9900,
+                transparent: true,
+                opacity: 0.6,
+                emissive: 0xff9900,
+                emissiveIntensity: 1.0,
+                side: THREE.DoubleSide
+            });
+            const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+            wave.position.copy(position);
+            wave.rotation.x = -Math.PI / 2;
+            scene.add(wave);
+            
+            let waveTime = 0;
+            const animateWave = () => {
+                waveTime += 0.05;
+                wave.scale.setScalar(1 + waveTime * 3);
+                waveMaterial.opacity = Math.max(0, 0.6 - waveTime * 2);
+                
+                if (waveMaterial.opacity > 0.01) {
+                    requestAnimationFrame(animateWave);
+                } else {
+                    scene.remove(wave);
+                }
+            };
+            animateWave();
+        }
+        
+        // スパーク生成関数（サイズ調整版）
+        function createBigSpark(position, color, velocity, scale = 1.0) {
+            const sparkGeometry = new THREE.SphereGeometry(0.04 * scale, 6, 6); // 0.1 → 0.04に縮小
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 2.0 // 2.5 → 2.0に調整
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 1.2; // 1.5 → 1.2に短縮
+            
+            const animateBigSpark = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.1)); // 0.12 → 0.1に調整
+                velocity.y -= 0.5;
+                velocity.multiplyScalar(0.94);
+                
+                lifeTime += 0.03;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 2.0 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateBigSpark);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateBigSpark();
+        }
+        
+        // 血のスパーク生成関数（サイズ調整版）
+        function createBigBloodSpark(position, velocity) {
+            const bloodColors = [0x8B0000, 0xDC143C, 0xB22222];
+            const color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.035, 6, 6); // 0.08 → 0.035に縮小
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.2 // 1.5 → 1.2に調整
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 1.5; // 1.8 → 1.5に短縮
+            
+            const animateBigBlood = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.08)); // 0.1 → 0.08に調整
+                velocity.y -= 0.6;
+                velocity.multiplyScalar(0.92);
+                
+                lifeTime += 0.025;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 1.2 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateBigBlood);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateBigBlood();
+        }
+        
+        // 大きな衝撃波エフェクト
+        function createBigImpactWave(position) {
+            const waveGeometry = new THREE.RingGeometry(0.2, 6, 20);
+            const waveMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff6600,
+                transparent: true,
+                opacity: 0.8,
+                emissive: 0xff6600,
+                emissiveIntensity: 1.5,
+                side: THREE.DoubleSide
+            });
+            const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+            wave.position.copy(position);
+            wave.rotation.x = -Math.PI / 2;
+            scene.add(wave);
+            
+            let waveTime = 0;
+            const animateWave = () => {
+                waveTime += 0.06;
+                wave.scale.setScalar(1 + waveTime * 4);
+                waveMaterial.opacity = Math.max(0, 0.8 - waveTime * 1.5);
+                waveMaterial.emissiveIntensity = 1.5 * (1 - waveTime);
+                
+                if (waveMaterial.opacity > 0.01) {
+                    requestAnimationFrame(animateWave);
+                } else {
+                    scene.remove(wave);
+                }
+            };
+            animateWave();
+        }
+        
+        // スパーク生成関数
+        function createSpark(position, color, velocity, life = 0.5) {
+            console.log('createSpark called:', position, color); // デバッグ用
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.025, 6, 6); // 0.05 → 0.025に縮小
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.0
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 0.8; // 1.0 → 0.8に短縮
+            
+            const animateSpark = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.08));
+                velocity.y -= 0.4; // 重力
+                velocity.multiplyScalar(0.95); // 減衰
+                
+                lifeTime += 0.02;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateSpark);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateSpark();
+        }
+        
+        // 血のスパーク生成関数
+        function createBloodSpark(position, velocity) {
+            console.log('createBloodSpark called:', position); // デバッグ用
+            
+            const bloodColors = [0x8B0000, 0xDC143C, 0xB22222]; // 濃い赤、深紅、暗い赤
+            const color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.04, 6, 6); // より大きく
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 0.3
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 1.2;
+            
+            const animateBlood = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.08));
+                velocity.y -= 0.5; // より強い重力
+                velocity.multiplyScalar(0.94); // より強い減衰
+                
+                lifeTime += 0.02;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateBlood);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateBlood();
+        }
+        
+        function createUltimateEffect(position, color) {
+            console.log('Ultimate effect triggered!');
+            
+            // 巨大な爆発フラッシュ（画面を照らす）
+            const flashGeometry = new THREE.SphereGeometry(8, 16, 16);
+            const flashMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 3.0
+            });
+            const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+            flash.position.copy(position);
+            scene.add(flash);
+            
+            // フラッシュアニメーション
+            let flashScale = 0.1;
+            const expandFlash = () => {
+                flashScale += 1.5;
+                flash.scale.setScalar(flashScale);
+                flashMaterial.opacity *= 0.85;
+                flashMaterial.emissiveIntensity *= 0.9;
+                if (flashMaterial.opacity > 0.01) {
+                    requestAnimationFrame(expandFlash);
+                } else {
+                    scene.remove(flash);
+                }
+            };
+            expandFlash();
+            
+            // 巨大スパーク爆発（第1波）
+            for (let i = 0; i < 120; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 30 + 15;
+                const velocity = new THREE.Vector3(
+                    Math.cos(angle) * speed,
+                    Math.random() * 25 + 10,
+                    Math.sin(angle) * speed
+                );
+                createMegaSpark(position, color, velocity, 1.5);
+            }
+            
+            // 巨大血のスパーク爆発
+            for (let i = 0; i < 60; i++) {
+                const velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 40,
+                    Math.random() * 30 + 8,
+                    (Math.random() - 0.5) * 40
+                );
+                createMegaBloodSpark(position, velocity);
+            }
+            
+            // 遅延爆発エフェクト（第2波）
+            setTimeout(() => {
+                for (let i = 0; i < 80; i++) {
+                    const velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 25,
+                        Math.random() * 20 + 5,
+                        (Math.random() - 0.5) * 25
+                    );
+                    createMegaSpark(position, 0xffffff, velocity, 1.2);
+                }
+            }, 200);
+            
+            // 最終波（第3波）
+            setTimeout(() => {
+                for (let i = 0; i < 40; i++) {
+                    const velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 15,
+                        Math.random() * 15 + 3,
+                        (Math.random() - 0.5) * 15
+                    );
+                    createMegaSpark(position, 0xffff00, velocity, 1.0);
+                }
+            }, 400);
+            
+            // 放射状エネルギー波
+            for (let i = 0; i < 16; i++) {
+                setTimeout(() => {
+                    const angle = (i / 16) * Math.PI * 2;
+                    createEnergyWave(position, angle, color);
+                }, i * 30);
+            }
+            
+            // 中央エネルギーコア
+            const coreGeometry = new THREE.SphereGeometry(1, 16, 16);
+            const coreMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 5
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            core.position.copy(position);
+            scene.add(core);
+            
+            let coreScale = 0.1;
+            const expandCore = () => {
+                coreScale += 0.3;
+                core.scale.setScalar(coreScale);
+                coreMaterial.opacity *= 0.85;
+                if (coreMaterial.opacity > 0.01) {
+                    requestAnimationFrame(expandCore);
+                } else {
+                    scene.remove(core);
+                }
+            };
+            expandCore();
+        }
+        
+        // 巨大スパーク生成関数
+        function createMegaSpark(position, color, velocity, scale = 1.0) {
+            const sparkGeometry = new THREE.SphereGeometry(0.08 * scale, 8, 8);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 2.0
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 2.0;
+            
+            const animateMegaSpark = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.1));
+                velocity.y -= 0.6;
+                velocity.multiplyScalar(0.92);
+                
+                lifeTime += 0.03;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 2.0 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateMegaSpark);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateMegaSpark();
+        }
+        
+        // 巨大血のスパーク生成関数
+        function createMegaBloodSpark(position, velocity) {
+            const bloodColors = [0x8B0000, 0xDC143C, 0xB22222];
+            const color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.0
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 2.5;
+            
+            const animateMegaBlood = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.12));
+                velocity.y -= 0.8;
+                velocity.multiplyScalar(0.9);
+                
+                lifeTime += 0.025;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateMegaBlood);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateMegaBlood();
+        }
+        
+        // エネルギー波生成関数
+        function createEnergyWave(position, angle, color) {
+            const waveGeometry = new THREE.CylinderGeometry(0.2, 0.05, 0.5, 8);
+            const waveMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                emissive: color,
+                emissiveIntensity: 1.5
+            });
+            const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+            wave.position.copy(position);
+            wave.rotation.z = angle;
+            scene.add(wave);
+            
+            let waveScale = 1;
+            const animateWave = () => {
+                waveScale += 0.5;
+                wave.scale.set(1, waveScale, 1);
+                wave.position.x += Math.cos(angle) * 2;
+                wave.position.z += Math.sin(angle) * 2;
+                waveMaterial.opacity *= 0.9;
+                
+                if (waveMaterial.opacity > 0.05) {
+                    requestAnimationFrame(animateWave);
+                } else {
+                    scene.remove(wave);
+                }
+            };
+            animateWave();
+        }
+        
+        // プレイヤークラス（完全版）
+        class Player {
+            constructor(color, x, isPlayer1) {
+                this.health = 200;
+                this.damage = 0;
+                this.specialGauge = 0;
+                this.isPlayer1 = isPlayer1;
+                this.color = color;
+                this.velocity = new THREE.Vector3(0, 0, 0);
+                this.isGrounded = false;
+                this.isDefending = false;
+                this.defendStun = 0; // 防御解除後の硬直時間
+                this.wasDefending = false; // 前フレームで防御していたかどうか
+                this.attackCooldown = 0;
+                this.bulletCooldown = 0;
+                this.chargeTime = 0;
+                this.isCharging = false;
+                this.gunChargeTime = 0;
+                this.isGunCharging = false;
+                this.swordRotation = 0;
+                this.lastGunPress = 0;
+                this.gunPressCount = 0;
+                this.gunRapidFire = false;
+                this.lastJumpPress = 0;
+                this.jumpPressCount = 0;
+                this.jumpRapidFire = false;
+                this.isJumpCharging = false;
+                this.jumpChargeTime = 0;
+                this.knockbackTimer = 0; // ノックバック保護時間
+                
+                // コンボシステム
+                this.comboCount = 0;
+                this.comboTimer = 0;
+                this.comboWindow = 1.0; // コンボの有効時間（秒）
+                
+                // シンプルな縦長の棒キャラクター
+                const bodyGeometry = new THREE.BoxGeometry(2, 6, 1.5);
+                const bodyMaterial = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.3,
+                    shininess: 100
+                });
+                this.mesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                this.mesh.position.set(x, 2, 0);
+                this.mesh.castShadow = true;
+                
+                scene.add(this.mesh);
+                
+                // リアルな剣の作成
+                this.sword = this.createRealisticSword();
+                const swordX = this.isPlayer1 ? 2.5 : -2.5; // 剣の位置を少し遠くに
+                this.sword.position.set(swordX, 0, 0);
+                
+                // 剣の向きを修正（プレイヤー2は左向き、プレイヤー1は右向き）
+                if (!this.isPlayer1) {
+                    this.sword.rotation.y = Math.PI; // 180度回転してプレイヤー2の剣を左向きに
+                }
+                
+                this.sword.visible = false;
+                this.mesh.add(this.sword);
+                
+                // 防御シールド
+                const shieldGeometry = new THREE.SphereGeometry(3, 16, 16);
+                const shieldMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: 0.3,
+                    emissive: 0x00ffff,
+                    emissiveIntensity: 0.5
+                });
+                this.shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
+                this.shield.visible = false; // 初期状態で確実に非表示
+                this.mesh.add(this.shield);
+                
+                // チャージオーラ
+                const auraGeometry = new THREE.SphereGeometry(4, 16, 16);
+                const auraMaterial = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    transparent: true,
+                    opacity: 0,
+                    emissive: color,
+                    emissiveIntensity: 1
+                });
+                this.aura = new THREE.Mesh(auraGeometry, auraMaterial);
+                this.mesh.add(this.aura);
+            }
+            
+            update(deltaTime) {
+                // 硬直時間の更新
+                this.defendStun = Math.max(0, this.defendStun - deltaTime);
+                
+                // 重力
+                if (!this.isGrounded) {
+                    this.velocity.y -= 30 * deltaTime;
+                }
+                
+                // 位置更新
+                this.mesh.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+                
+                // プレイヤー同士の衝突判定
+                const opponent = this.isPlayer1 ? player2 : player1;
+                const distance = this.mesh.position.distanceTo(opponent.mesh.position);
+                const minDistance = 3.0; // 最小距離（両プレイヤーの幅を考慮）
+                
+                if (distance < minDistance) {
+                    // 衝突時の押し戻し処理
+                    const direction = new THREE.Vector3().subVectors(this.mesh.position, opponent.mesh.position).normalize();
+                    const pushDistance = (minDistance - distance) / 2;
+                    
+                    // 両プレイヤーを押し戻す
+                    this.mesh.position.add(direction.clone().multiplyScalar(pushDistance));
+                    opponent.mesh.position.sub(direction.clone().multiplyScalar(pushDistance));
+                    
+                    // 横方向の速度を減衰（押し合い効果）
+                    if (Math.sign(this.velocity.x) === Math.sign(direction.x)) {
+                        this.velocity.x *= 0.5;
+                    }
+                    if (Math.sign(opponent.velocity.x) === Math.sign(-direction.x)) {
+                        opponent.velocity.x *= 0.5;
+                    }
+                }
+                
+                // 地面判定
+                if (this.mesh.position.y <= 2) {
+                    this.mesh.position.y = 2;
+                    this.velocity.y = 0;
+                    this.isGrounded = true;
+                }
+                
+                // クールダウン更新
+                this.attackCooldown = Math.max(0, this.attackCooldown - deltaTime);
+                this.bulletCooldown = Math.max(0, this.bulletCooldown - deltaTime);
+                
+                // 剣のモーション
+                if (this.sword.visible) {
+                    this.swordRotation += deltaTime * 20;
+                    // プレイヤー2の剣は180度回転しているため、振り方向も考慮
+                    const swingDirection = this.isPlayer1 ? -1 : -1; // 両方とも同じ方向に振る
+                    const positionDirection = this.isPlayer1 ? 1 : -1; // 位置移動の方向
+                    
+                    this.sword.rotation.z = Math.sin(this.swordRotation) * 1.5 * swingDirection;
+                    this.sword.position.x = (this.isPlayer1 ? 2.5 : -2.5) + Math.sin(this.swordRotation) * 0.8 * positionDirection;
+                    
+                    if (this.attackCooldown < 0.1) {
+                        this.sword.visible = false;
+                        this.sword.rotation.z = 0;
+                        this.sword.position.x = this.isPlayer1 ? 2.5 : -2.5;
+                        this.swordRotation = 0;
+                    }
+                }
+                
+                // チャージエフェクト強化
+                if (this.isCharging) {
+                    this.chargeTime += deltaTime * 0.7;
+                    const chargeRatio = Math.min(1, this.chargeTime / 2);
+                    this.aura.material.opacity = chargeRatio * 0.7;
+                    this.aura.scale.setScalar(1 + Math.sin(this.chargeTime * 8) * 0.2);
+                    this.updateChargeBar();
+                    
+                    // チャージパーティクル（小さく調整）
+                    if (Math.random() < 0.3 * chargeRatio) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = 2 + Math.random() * 1;
+                        const particlePos = this.mesh.position.clone();
+                        particlePos.x += Math.cos(angle) * radius;
+                        particlePos.y += Math.sin(angle) * radius;
+                        particlePos.z += (Math.random() - 0.5) * 1;
+                        
+                        const velocity = new THREE.Vector3(
+                            -Math.cos(angle) * 4,
+                            -Math.sin(angle) * 4,
+                            0
+                        );
+                        createParticle(particlePos, this.color, 0.15 * chargeRatio, velocity, 0.4);
+                    }
+                } else if (this.aura.material.opacity > 0) {
+                    this.aura.material.opacity *= 0.9;
+                    this.aura.scale.setScalar(1);
+                }
+                
+                if (this.isGunCharging) {
+                    this.gunChargeTime += deltaTime * 0.8;
+                    const chargeRatio = Math.min(1, this.gunChargeTime / 1.5);
+                    this.updateChargeBar();
+                    
+                    // 銃チャージパーティクル強化
+                    if (Math.random() < 0.3 * chargeRatio) {
+                        const direction = this.isPlayer1 ? 1 : -1;
+                        const gunPos = this.mesh.position.clone();
+                        gunPos.x += direction * 2;
+                        gunPos.y += (Math.random() - 0.5) * 1;
+                        
+                        const velocity = new THREE.Vector3(direction * 3, Math.random() * 5, 0);
+                        createParticle(gunPos, 0xffff00, 0.2 * chargeRatio, velocity, 0.4);
+                    }
+                }
+                
+                // ジャンプチャージエフェクト
+                if (this.isJumpCharging) {
+                    this.jumpChargeTime += deltaTime * 2.0; // ジャンプチャージは速め
+                    
+                    // しゃがみアニメーション
+                    const chargeRatio = Math.min(1, this.jumpChargeTime / 0.5);
+                    const squashFactor = 1 - (chargeRatio * 0.4); // 最大40%縮小
+                    const stretchFactor = 1 + (chargeRatio * 0.2); // 横に20%拡大
+                    this.mesh.scale.set(stretchFactor, squashFactor, 1);
+                } else {
+                    // 通常状態に戻す
+                    this.mesh.scale.set(1, 1, 1);
+                }
+                
+                // コンボタイマー更新
+                if (this.comboTimer > 0) {
+                    this.comboTimer -= deltaTime;
+                    if (this.comboTimer <= 0) {
+                        this.comboCount = 0;
+                        this.updateComboDisplay();
+                    }
+                }
+                
+                // ノックバック保護タイマーを更新
+                this.knockbackTimer = Math.max(0, this.knockbackTimer - deltaTime);
+                
+                // ノックバック中は減衰をほぼ無効化、通常時は強く減衰
+                if (this.knockbackTimer > 0) {
+                    this.velocity.x *= 0.995; // ノックバック中はほぼ減衰なし
+                    // console.log(`⚡ノックバック中: 横速度=${this.velocity.x}, 位置=${this.mesh.position.x}, タイマー=${this.knockbackTimer.toFixed(2)}`);
+                } else {
+                    this.velocity.x *= 0.88; // 通常時は強い減衰
+                }
+                
+                // ステージ外落下判定（ステージサイズ40なので端は±20）
+                if (Math.abs(this.mesh.position.x) > 20 || this.mesh.position.y < -5) {
+                    // 即座に敗北
+                    this.health = 0;
+                    this.mesh.visible = false;
+                    showWinner(this.isPlayer1 ? "プレイヤー 2" : "プレイヤー 1");
+                }
+            }
+            
+            move(direction) {
+                // 硬直中または防御中は移動できない
+                if (!this.isDefending && this.defendStun <= 0) {
+                    this.velocity.x = direction * 15;
+                }
+            }
+            
+            startJumpCharge() {
+                if (this.isGrounded && !this.isDefending && this.defendStun <= 0) {
+                    const now = Date.now();
+                    
+                    // 連打判定: 300ms以内に複数回押されたら連打モード
+                    if (now - this.lastJumpPress < 300) {
+                        this.jumpPressCount++;
+                        if (this.jumpPressCount >= 2) {
+                            this.jumpRapidFire = true;
+                            this.jumpPressCount = 0;
+                        }
+                    } else {
+                        this.jumpPressCount = 1;
+                        this.jumpRapidFire = false;
+                    }
+                    
+                    this.lastJumpPress = now;
+                    
+                    if (this.jumpRapidFire) {
+                        // 連打モード: 即座に小ジャンプ
+                        this.instantJump();
+                    } else {
+                        // チャージモード
+                        this.isJumpCharging = true;
+                        this.jumpChargeTime = 0;
+                    }
+                }
+            }
+            
+            releaseJump() {
+                if (!this.isJumpCharging) return;
+                
+                this.isJumpCharging = false;
+                const chargeRatio = Math.min(1, this.jumpChargeTime / 0.5); // 0.5秒でフルチャージ
+                this.jumpChargeTime = 0;
+                
+                this.performJump(chargeRatio);
+            }
+            
+            instantJump() {
+                this.performJump(0.3); // 連打ジャンプは30%の高さ
+            }
+            
+            performJump(chargeRatio) {
+                if (this.isGrounded) {
+                    // ジャンプ力を20（最大）から6（最小）の範囲で調整
+                    const minJump = 6;
+                    const maxJump = 20;
+                    const jumpPower = minJump + (maxJump - minJump) * chargeRatio;
+                    
+                    this.velocity.y = jumpPower;
+                    this.isGrounded = false;
+                }
+            }
+            
+            jump() {
+                // 後方互換性のため残しておく
+                this.releaseJump();
+            }
+            
+            startCharge() {
+                if (this.attackCooldown <= 0 && !this.isDefending && this.defendStun <= 0) {
+                    this.isCharging = true;
+                }
+            }
+            
+            releaseAttack() {
+                if (!this.isCharging) return;
+                
+                this.isCharging = false;
+                const isCharged = this.chargeTime > 1.5;
+                this.chargeTime = 0;
+                this.updateChargeBar();
+                
+                this.sword.visible = true;
+                this.attackCooldown = isCharged ? 0.5 : 0.2;
+                
+                // 剣の軌跡エフェクト強化
+                const direction = this.isPlayer1 ? 1 : -1;
+                const swordPos = this.mesh.position.clone();
+                swordPos.x += direction * 2;
+                
+                // 剣の軌跡パーティクル（小さく調整）
+                for (let i = 0; i < 8; i++) {
+                    const trailPos = swordPos.clone();
+                    trailPos.y += (i - 4) * 0.3;
+                    trailPos.x += (Math.random() - 0.5) * 0.5;
+                    const velocity = new THREE.Vector3(direction * 3, 0, 0);
+                    createParticle(trailPos, isCharged ? 0xff00ff : 0xffffff, 0.1, velocity, 0.2);
+                }
+                
+                // チャージ攻撃時の追加スパーク
+                if (isCharged) {
+                    for (let i = 0; i < 8; i++) {
+                        const velocity = new THREE.Vector3(
+                            (Math.random() - 0.5) * 12,
+                            Math.random() * 8 + 2,
+                            (Math.random() - 0.5) * 12
+                        );
+                        createSpark(swordPos, 0xff6600, velocity, 0.4);
+                    }
+                }
+                
+                // オンラインモードで攻撃をブロードキャスト
+                if (isOnlineMode) {
+                    sendAttack('sword', { 
+                        isCharged: isCharged,
+                        position: this.mesh.position.clone(),
+                        playerNumber: this.isPlayer1 ? 1 : 2
+                    });
+                }
+                
+                // 攻撃判定
+                const opponent = this.isPlayer1 ? player2 : player1;
+                const distance = this.mesh.position.distanceTo(opponent.mesh.position);
+                
+                if (distance < (isCharged ? 10 : 8)) { // 攻撃範囲を拡大
+                    const damage = isCharged ? 45 : 22; // 1.5倍に調整 (30→45, 15→22)
+                    const knockback = isCharged ? 25 : 10;
+                    
+                    console.log(`⚔️ 剣攻撃ヒット: ダメージ=${damage}, チャージ=${isCharged}, 距離=${distance.toFixed(2)}`);
+                    
+                    // オンラインモードでダメージをブロードキャスト
+                    if (isOnlineMode) {
+                        sendDamage({
+                            damage: damage,
+                            type: 'sword',
+                            targetPlayer: opponent.isPlayer1 ? 1 : 2,
+                            attackerPos: this.mesh.position.clone(),
+                            isCharged: isCharged
+                        });
+                    }
+                    
+                    // 新しいtakeDamage関数を使用（攻撃者の位置と攻撃者を渡す）
+                    opponent.takeDamage(damage, this.mesh.position, this);
+                    
+                    createHitEffect(opponent.mesh.position, opponent.isDefending, 'sword', damage);
+                    
+                    // チャージ攻撃時は必殺技エフェクトも追加
+                    if (isCharged) {
+                        createUltimateEffect(opponent.mesh.position, this.color);
+                    }
+                    
+                    this.specialGauge = Math.min(100, this.specialGauge + (isCharged ? 30 : 15));
+                    this.updateSpecialBar();
+                }
+            }
+            
+            attack() {
+                this.releaseAttack();
+            }
+            
+            defend(active) {
+                // 硬直中は防御できない
+                if (this.defendStun > 0) {
+                    active = false;
+                }
+                
+                // 移動中は防御できない
+                if (Math.abs(this.velocity.x) > 1) {
+                    active = false;
+                }
+                
+                // 防御解除時に硬直を追加
+                if (this.wasDefending && !active) {
+                    this.defendStun = 0.2; // 0.2秒硬直
+                }
+                
+                this.wasDefending = this.isDefending;
+                this.isDefending = active;
+                this.shield.visible = active;
+                
+                if (active) {
+                    this.velocity.x = 0;
+                    // チャージをキャンセル
+                    this.releaseAttack();
+                    this.releaseGun();
+                }
+            }
+            
+            startGunCharge() {
+                if (this.bulletCooldown <= 0 && !this.isDefending && this.defendStun <= 0) {
+                    const now = Date.now();
+                    
+                    // 連打判定: 500ms以内に複数回押されたら連打モード
+                    if (now - this.lastGunPress < 500) {
+                        this.gunPressCount++;
+                        if (this.gunPressCount >= 2) {
+                            this.gunRapidFire = true;
+                            this.gunPressCount = 0;
+                        }
+                    } else {
+                        this.gunPressCount = 1;
+                        this.gunRapidFire = false;
+                    }
+                    
+                    this.lastGunPress = now;
+                    
+                    if (this.gunRapidFire) {
+                        // 連打モード: 即座に発射
+                        this.instantGunShot();
+                    } else {
+                        // チャージモード
+                        this.isGunCharging = true;
+                    }
+                }
+            }
+            
+            releaseGun() {
+                if (!this.isGunCharging) return;
+                
+                this.isGunCharging = false;
+                const isCharged = this.gunChargeTime > 1;
+                const chargeRatio = Math.max(0.8, Math.min(1, this.gunChargeTime / 1.5));
+                this.gunChargeTime = 0;
+                this.updateChargeBar();
+                
+                this.createBullet(isCharged, chargeRatio);
+            }
+            
+            instantGunShot() {
+                this.createBullet(false, 0.3); // 連打弾は小さめの弾として扱う
+            }
+            
+            createBullet(isCharged, chargeRatio) {
+                this.bulletCooldown = isCharged ? 0.8 : (this.gunRapidFire ? 0.15 : 0.3);
+                
+                // オンラインモードで銃攻撃をブロードキャスト
+                if (isOnlineMode) {
+                    sendAttack('gun', { 
+                        isCharged: isCharged,
+                        chargeRatio: chargeRatio,
+                        position: this.mesh.position.clone(),
+                        playerNumber: this.isPlayer1 ? 1 : 2
+                    });
+                }
+                
+                const opponent = this.isPlayer1 ? player2 : player1;
+                const direction = Math.sign(opponent.mesh.position.x - this.mesh.position.x);
+                
+                // チャージ度合いに応じたサイズとダメージを計算
+                const minSize = 0.3;
+                const maxSize = isCharged ? 1.5 : 0.8;
+                const bulletSize = minSize + (maxSize - minSize) * chargeRatio;
+                
+                const minDamage = 5;
+                const maxDamage = isCharged ? 30 : 15;
+                const damage = minDamage + (maxDamage - minDamage) * chargeRatio;
+                
+                const minKnockback = 2;
+                const maxKnockback = isCharged ? 25 : 8;
+                const knockback = minKnockback + (maxKnockback - minKnockback) * chargeRatio;
+                
+                const speed = 25 + (isCharged ? 20 : 10) * chargeRatio;
+                
+                // 弾丸作成
+                const bulletGeometry = new THREE.SphereGeometry(bulletSize, 8, 8);
+                const bulletMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xffff00,
+                    emissive: 0xffff00,
+                    emissiveIntensity: 0.6 + 0.4 * chargeRatio
+                });
+                const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+                bullet.position.copy(this.mesh.position);
+                bullet.position.x += direction * 2;
+                
+                // チャージ弾の特殊エフェクト
+                if (isCharged) {
+                    const chargeAura = new THREE.SphereGeometry(bulletSize * 1.8, 16, 16);
+                    const chargeAuraMat = new THREE.MeshBasicMaterial({ 
+                        color: 0xff00ff,
+                        transparent: true,
+                        opacity: 0.3 + 0.3 * chargeRatio
+                    });
+                    const aura = new THREE.Mesh(chargeAura, chargeAuraMat);
+                    bullet.add(aura);
+                    
+                    // 発射エフェクト
+                    createUltimateEffect(bullet.position, 0xffff00);
+                }
+                
+                // 弾丸トレイル（チャージ度合いに応じてサイズ変更）
+                const trailLength = 2 + 2 * chargeRatio;
+                const trailGeometry = new THREE.BoxGeometry(trailLength, 0.1 + 0.2 * chargeRatio, 0.1 + 0.2 * chargeRatio);
+                const trailMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 0.3 + 0.3 * chargeRatio
+                });
+                const trail = new THREE.Mesh(trailGeometry, trailMaterial);
+                bullet.add(trail);
+                trail.position.x = -direction * trailLength / 2;
+                
+                scene.add(bullet);
+                bullets.push({
+                    mesh: bullet,
+                    velocity: new THREE.Vector3(direction * speed, 0, 0),
+                    owner: this,
+                    damage: damage,
+                    knockback: knockback,
+                    isCharged: isCharged
+                });
+            }
+            
+            shoot() {
+                this.releaseGun();
+            }
+            
+            ultimate() {
+                if (this.specialGauge >= 100 && this.defendStun <= 0) {
+                    this.specialGauge = 0;
+                    this.updateSpecialBar();
+                    
+                    // オンラインモードで必殺技をブロードキャスト
+                    if (isOnlineMode) {
+                        sendAttack('ultimate', { 
+                            position: this.mesh.position.clone(),
+                            playerNumber: this.isPlayer1 ? 1 : 2
+                        });
+                    }
+                    
+                    const opponent = this.isPlayer1 ? player2 : player1;
+                    const distance = this.mesh.position.distanceTo(opponent.mesh.position);
+                    
+                    if (distance < 15) {
+                        console.log(`💥 必殺技ヒット: ダメージ=50, 距離=${distance.toFixed(2)}`);
+                        
+                        // オンラインモードでダメージをブロードキャスト
+                        if (isOnlineMode) {
+                            sendDamage({
+                                damage: 50,
+                                type: 'ultimate',
+                                targetPlayer: opponent.isPlayer1 ? 1 : 2,
+                                attackerPos: this.mesh.position.clone()
+                            });
+                        }
+                        
+                        // 必殺技のダメージとノックバック（特別演出付き）
+                        gameSpeed = 0.1; // 必殺技時は更に時間を遅く
+                        setTimeout(() => {
+                            gameSpeed = 1.0;
+                        }, 500);
+                        
+                        screenShake.intensity = 2;
+                        screenShake.duration = 0.5;
+                        
+                        opponent.takeDamage(50, this.mesh.position, this);
+                        
+                        createHitEffect(opponent.mesh.position, opponent.isDefending, 'ultimate', 50);
+                        createUltimateEffect(opponent.mesh.position, this.color);
+                    }
+                }
+            }
+            
+            updateHealthBar() {
+                const healthBar = document.getElementById(this.isPlayer1 ? 'health1' : 'health2');
+                const healthPercentage = (this.health / 200) * 100;
+                healthBar.style.width = healthPercentage + '%';
+            }
+            
+            updateHealthDisplay() {
+                const healthDisplay = document.getElementById(this.isPlayer1 ? 'healthValue1' : 'healthValue2');
+                healthDisplay.textContent = Math.max(0, Math.floor(this.health));
+            }
+            
+            updateSpecialBar() {
+                const specialBar = document.getElementById(this.isPlayer1 ? 'special1' : 'special2');
+                specialBar.style.width = this.specialGauge + '%';
+                
+                // 必殺技ゲージ満タン時の雷エフェクト
+                if (this.specialGauge >= 100) {
+                    this.createLightningEffect();
+                }
+            }
+            
+            createLightningEffect() {
+                // プレイヤー周囲に雷エフェクトを生成
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = 2 + Math.random() * 3;
+                        const lightningPos = this.mesh.position.clone();
+                        lightningPos.x += Math.cos(angle) * radius;
+                        lightningPos.y += Math.random() * 4;
+                        lightningPos.z += Math.sin(angle) * radius;
+                        
+                        // 雷のパーティクル
+                        const velocity = new THREE.Vector3(
+                            (Math.random() - 0.5) * 10,
+                            Math.random() * 20,
+                            (Math.random() - 0.5) * 10
+                        );
+                        createParticle(lightningPos, 0x66ffff, 0.3, velocity, 0.3);
+                        
+                        // 電撃の光る線
+                        this.createLightningBolt(lightningPos);
+                    }, i * 100);
+                }
+                
+                // プレイヤー自体に電撃オーラ
+                this.aura.material.opacity = 0.8;
+                this.aura.material.color.setHex(0x66ffff);
+                this.aura.material.emissive.setHex(0x0066ff);
+                this.aura.material.emissiveIntensity = 2;
+                
+                setTimeout(() => {
+                    this.aura.material.color.setHex(this.color);
+                    this.aura.material.emissive.setHex(this.color);
+                    this.aura.material.emissiveIntensity = 1;
+                }, 1000);
+            }
+            
+            createLightningBolt(startPos) {
+                // 雷の閃光エフェクト
+                const flashGeometry = new THREE.SphereGeometry(0.5, 8, 8);
+                const flashMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x66ffff,
+                    transparent: true,
+                    opacity: 1,
+                    emissive: 0x66ffff,
+                    emissiveIntensity: 3
+                });
+                const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+                flash.position.copy(startPos);
+                scene.add(flash);
+                
+                // 閃光の拡張と消失
+                let scale = 1;
+                const expandFlash = () => {
+                    scale += 0.2;
+                    flash.scale.setScalar(scale);
+                    flashMaterial.opacity *= 0.85;
+                    if (flashMaterial.opacity > 0.01) {
+                        requestAnimationFrame(expandFlash);
+                    } else {
+                        scene.remove(flash);
+                    }
+                };
+                expandFlash();
+            }
+            
+            updateChargeBar() {
+                const chargeBar = document.getElementById(this.isPlayer1 ? 'charge1' : 'charge2');
+                const chargeRatio = Math.max(this.chargeTime / 2, this.gunChargeTime / 1.5);
+                chargeBar.style.width = (Math.min(1, chargeRatio) * 100) + '%';
+            }
+            
+            // コンボシステム
+            addCombo() {
+                this.comboCount++;
+                this.comboTimer = this.comboWindow;
+                this.updateComboDisplay();
+            }
+            
+            updateComboDisplay() {
+                const comboDisplay = document.getElementById(this.isPlayer1 ? 'combo1' : 'combo2');
+                if (this.comboCount > 1) {
+                    comboDisplay.textContent = `${this.comboCount} HITS!`;
+                    comboDisplay.className = `combo-display ${this.isPlayer1 ? 'player1' : 'player2'} show`;
+                    
+                    // アニメーションリセット
+                    comboDisplay.style.animation = 'none';
+                    setTimeout(() => {
+                        comboDisplay.style.animation = 'comboFloat 0.5s ease-out';
+                    }, 10);
+                    
+                    console.log(`🔥 ${this.isPlayer1 ? 'P1' : 'P2'} COMBO: ${this.comboCount} HITS!`);
+                } else {
+                    comboDisplay.className = `combo-display ${this.isPlayer1 ? 'player1' : 'player2'}`;
+                }
+            }
+            
+            showDamageNumber(amount) {
+                console.log(`💥 showDamageNumber呼び出し: ${amount}ダメージ, プレイヤー=${this.isPlayer1 ? 'P1' : 'P2'}`);
+                
+                const damageDiv = document.createElement('div');
+                damageDiv.className = 'damage-number';
+                damageDiv.textContent = amount.toString();
+                damageDiv.style.color = '#ff6600';
+                damageDiv.style.fontSize = '24px';
+                damageDiv.style.fontWeight = 'bold';
+                damageDiv.style.textShadow = '0 0 5px #000, 2px 2px 2px #000';
+                damageDiv.style.zIndex = '999';
+                damageDiv.style.pointerEvents = 'none';
+                
+                // 3D座標を2D画面座標に変換
+                const vector = new THREE.Vector3();
+                vector.setFromMatrixPosition(this.mesh.matrixWorld);
+                vector.project(camera);
+                
+                const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (vector.y * -0.5 + 0.5) * window.innerHeight;
+                
+                damageDiv.style.position = 'absolute';
+                damageDiv.style.left = (x - 12) + 'px'; // 中央揃え調整
+                damageDiv.style.top = (y - 30) + 'px';
+                
+                console.log(`📍 ダメージ表示位置: (${x}, ${y}), DOM要素作成完了`);
+                
+                document.body.appendChild(damageDiv);
+                
+                // アニメーション効果を手動で適用
+                damageDiv.style.animation = 'damageFloat 1s ease-out forwards';
+                
+                // 1秒後に削除
+                setTimeout(() => {
+                    if (damageDiv.parentNode) {
+                        damageDiv.parentNode.removeChild(damageDiv);
+                        console.log(`🗑️ ダメージ表示削除: ${amount}`);
+                    }
+                }, 1000);
+                
+                console.log(`✅ ダメージ表示完了: ${amount}`);
+            }
+            
+            takeDamage(amount, attackerPosition = null, attacker = null) {
+                console.log(`💢 takeDamage呼び出し: ダメージ=${amount}, 防御中=${this.isDefending}, 攻撃者=${attacker ? (attacker.isPlayer1 ? 'P1' : 'P2') : 'なし'}`);
+                
+                if (this.isDefending) {
+                    amount *= 0.2; // 80%防御（20%のダメージのみ受ける）
+                    console.log(`🛡️ 防御により軽減: ${amount}ダメージ`);
+                } else {
+                    // ヒットストップ効果（防御していない場合のみ）
+                    gameSpeed = 0.2;
+                    setTimeout(() => {
+                        gameSpeed = 1.0;
+                    }, 100);
+                    console.log(`⚡ ヒットストップ発動: ${amount}ダメージ`);
+                    
+                    // スクリーンシェイク
+                    screenShake.intensity = amount * 0.1;
+                    screenShake.duration = 0.2;
+                    console.log(`🌪️ スクリーンシェイク: 強度${screenShake.intensity.toFixed(2)}`);
+                    
+                    // 攻撃者のコンボカウント
+                    if (attacker) {
+                        attacker.addCombo();
+                        console.log(`🔥 コンボ追加: ${attacker.isPlayer1 ? 'P1' : 'P2'} -> ${attacker.comboCount}`);
+                    }
+                }
+                
+                this.damage += amount;
+                this.health = Math.max(0, this.health - amount);
+                this.updateHealthBar();
+                this.updateHealthDisplay();
+                
+                // ダメージ表示（DOM要素で）
+                this.showDamageNumber(Math.floor(amount));
+                
+                // 被ダメージ時の強化エフェクト
+                this.createDamageEffect(amount, this.isDefending);
+                
+                // 攻撃力に応じたノックバック処理（確実に横方向に飛ばす）
+                if (attackerPosition && !this.isDefending) {
+                    const knockbackDirection = Math.sign(this.mesh.position.x - attackerPosition.x);
+                    
+                    // 超強力なノックバック力（絶対に横方向に飛ばす）
+                    const horizontalKnockback = amount * 2.0; // ノックバック力をさらに強化
+                    this.velocity.x = knockbackDirection * horizontalKnockback;
+                    
+                    // 縦方向のノックバックで飛び上がり効果
+                    const verticalKnockback = amount * 0.5; // 縦方向ノックバック
+                    this.velocity.y = verticalKnockback;
+                    this.isGrounded = false;
+                    
+                    // ノックバック保護タイマーを設定（1.5秒間減衰を弱く）
+                    this.knockbackTimer = 1.5;
+                    
+                    console.log(`🚀ノックバック適用: ダメージ=${amount}, 方向=${knockbackDirection}, 横速度=${this.velocity.x}, 縦速度=${this.velocity.y}, 位置=${this.mesh.position.x}`);
+                }
+                
+                createHitEffect(this.mesh.position, this.isDefending);
+                
+                if (this.health <= 0) {
+                    this.mesh.visible = false;
+                    showWinner(this.isPlayer1 ? playerNames.player2 : playerNames.player1);
+                }
+            }
+            
+            // リアルな剣の作成関数
+            createRealisticSword() {
+                const swordGroup = new THREE.Group();
+                
+                // 1. 刀身（Blade）- より細長くリアルに
+                const bladeGeometry = new THREE.BoxGeometry(0.1, 6, 0.3);
+                const bladeMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xe8e8e8,
+                    shininess: 200,
+                    reflectivity: 0.8,
+                    emissive: 0x444444,
+                    emissiveIntensity: 0.2
+                });
+                const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+                blade.position.y = 2; // 刀身の中心を上に
+                blade.castShadow = true;
+                swordGroup.add(blade);
+                
+                // 2. 刀身の先端（Tip）- 三角形の先端
+                const tipGeometry = new THREE.ConeGeometry(0.15, 0.8, 8);
+                const tipMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xe8e8e8,
+                    shininess: 200,
+                    reflectivity: 0.8
+                });
+                const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+                tip.position.y = 5.4; // 刀身の上端
+                tip.castShadow = true;
+                swordGroup.add(tip);
+                
+                // 3. 鍔（Crossguard）- 横に伸びる十字の部分
+                const crossguardGeometry = new THREE.BoxGeometry(1.2, 0.2, 0.4);
+                const crossguardMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x8b7355,
+                    shininess: 80,
+                    emissive: 0x2a1a0f,
+                    emissiveIntensity: 0.3
+                });
+                const crossguard = new THREE.Mesh(crossguardGeometry, crossguardMaterial);
+                crossguard.position.y = -1; // 刀身の下
+                crossguard.castShadow = true;
+                swordGroup.add(crossguard);
+                
+                // 4. 柄（Handle）- 握る部分
+                const handleGeometry = new THREE.CylinderGeometry(0.12, 0.12, 2, 12);
+                const handleMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x654321,
+                    shininess: 30,
+                    roughness: 0.8
+                });
+                const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+                handle.position.y = -2.2; // 鍔の下
+                handle.castShadow = true;
+                swordGroup.add(handle);
+                
+                // 5. 柄巻き（Handle wrap）- 装飾的なライン
+                for (let i = 0; i < 8; i++) {
+                    const wrapGeometry = new THREE.TorusGeometry(0.13, 0.02, 6, 16);
+                    const wrapMaterial = new THREE.MeshPhongMaterial({ 
+                        color: 0x2c1810,
+                        shininess: 10
+                    });
+                    const wrap = new THREE.Mesh(wrapGeometry, wrapMaterial);
+                    wrap.position.y = -1.4 - (i * 0.2);
+                    wrap.rotation.x = Math.PI / 2;
+                    swordGroup.add(wrap);
+                }
+                
+                // 6. 柄頭（Pommel）- 柄の末端
+                const pommelGeometry = new THREE.SphereGeometry(0.18, 12, 12);
+                const pommelMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x8b7355,
+                    shininess: 100,
+                    emissive: 0x2a1a0f,
+                    emissiveIntensity: 0.4
+                });
+                const pommel = new THREE.Mesh(pommelGeometry, pommelMaterial);
+                pommel.position.y = -3.3; // 柄の下端
+                pommel.castShadow = true;
+                swordGroup.add(pommel);
+                
+                // 7. 刀身の血溝（Fuller）- 刀身の中央のくぼみ
+                const fullerGeometry = new THREE.BoxGeometry(0.02, 5, 0.1);
+                const fullerMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xd0d0d0,
+                    shininess: 150
+                });
+                const fuller = new THREE.Mesh(fullerGeometry, fullerMaterial);
+                fuller.position.set(0, 2, 0.16); // 刀身の前面
+                swordGroup.add(fuller);
+                
+                // 影の設定
+                swordGroup.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                
+                return swordGroup;
+            }
+            
+            // 被ダメージエフェクト
+            createDamageEffect(damage, isDefending) {
+                const position = this.mesh.position.clone();
+                
+                if (isDefending) {
+                    // 防御時は既に createDefenseEffect が createHitEffect から呼ばれている
+                    return;
+                } else {
+                    // 被ダメージ時の特殊エフェクト
+                    
+                    // キャラクターを赤く光らせる
+                    const originalEmissive = this.mesh.material.emissive.clone();
+                    this.mesh.material.emissive.setHex(0xff0000);
+                    this.mesh.material.emissiveIntensity = 0.5;
+                    
+                    setTimeout(() => {
+                        this.mesh.material.emissive.copy(originalEmissive);
+                        this.mesh.material.emissiveIntensity = 0;
+                    }, 200);
+                    
+                    // 痛みエフェクト（赤いパーティクル）
+                    for (let i = 0; i < Math.floor(damage / 5) + 5; i++) {
+                        setTimeout(() => {
+                            const sparkPos = position.clone();
+                            sparkPos.add(new THREE.Vector3(
+                                (Math.random() - 0.5) * 2,
+                                Math.random() * 3,
+                                (Math.random() - 0.5) * 2
+                            ));
+                            
+                            const velocity = new THREE.Vector3(
+                                (Math.random() - 0.5) * 8,
+                                Math.random() * 6 + 2,
+                                (Math.random() - 0.5) * 8
+                            );
+                            
+                            createPainSpark(sparkPos, velocity);
+                        }, i * 20);
+                    }
+                    
+                    // 大ダメージ時は特別エフェクト
+                    if (damage >= 30) {
+                        this.createMajorDamageEffect(position, damage);
+                    }
+                }
+            }
+            
+            // 重大ダメージエフェクト
+            createMajorDamageEffect(position, damage) {
+                // 爆発的な血しぶき
+                for (let i = 0; i < 20; i++) {
+                    const velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 20,
+                        Math.random() * 15 + 5,
+                        (Math.random() - 0.5) * 20
+                    );
+                    createMegaBloodSpark(position.clone(), velocity);
+                }
+                
+                // 衝撃リング
+                const ringGeometry = new THREE.RingGeometry(0.5, 4, 20);
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xff0000,
+                    transparent: true,
+                    opacity: 0.8,
+                    emissive: 0xff0000,
+                    emissiveIntensity: 1.0,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.copy(position);
+                ring.rotation.x = -Math.PI / 2;
+                scene.add(ring);
+                
+                let ringTime = 0;
+                const animateRing = () => {
+                    ringTime += 0.1;
+                    ring.scale.setScalar(1 + ringTime * 2);
+                    ringMaterial.opacity = Math.max(0, 0.8 - ringTime);
+                    
+                    if (ringMaterial.opacity > 0.01) {
+                        requestAnimationFrame(animateRing);
+                    } else {
+                        scene.remove(ring);
+                    }
+                };
+                animateRing();
+            }
+        }
+        
+        // 痛みスパーク生成関数
+        function createPainSpark(position, velocity) {
+            const painColors = [0xff0000, 0xff3333, 0xff6666];
+            const color = painColors[Math.floor(Math.random() * painColors.length)];
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.03, 6, 6);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.5
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 1.0;
+            
+            const animatePain = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.06));
+                velocity.y -= 0.5;
+                velocity.multiplyScalar(0.95);
+                
+                lifeTime += 0.03;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 1.5 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animatePain);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animatePain();
+        }
+        
+        // スケール対応のスパーク生成関数
+        function createScaledSpark(position, color, velocity, life = 0.8, scale = 1.0) {
+            const sparkGeometry = new THREE.SphereGeometry(0.025 * scale, 6, 6);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.5
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = life;
+            
+            const animateSpark = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.08 * scale));
+                velocity.y -= 0.4;
+                velocity.multiplyScalar(0.95);
+                
+                lifeTime += 0.02;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 1.5 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateSpark);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateSpark();
+        }
+        
+        // スケール対応の血のスパーク生成関数
+        function createScaledBloodSpark(position, velocity, scale = 1.0) {
+            const bloodColors = [0x8B0000, 0xDC143C, 0xB22222];
+            const color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
+            
+            const sparkGeometry = new THREE.SphereGeometry(0.03 * scale, 6, 6);
+            const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 1,
+                emissive: color,
+                emissiveIntensity: 1.0
+            });
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+            spark.position.copy(position);
+            scene.add(spark);
+            
+            let lifeTime = 0;
+            const maxLife = 1.2;
+            
+            const animateBlood = () => {
+                spark.position.add(velocity.clone().multiplyScalar(0.08 * scale));
+                velocity.y -= 0.6;
+                velocity.multiplyScalar(0.92);
+                
+                lifeTime += 0.025;
+                sparkMaterial.opacity = 1 - (lifeTime / maxLife);
+                sparkMaterial.emissiveIntensity = 1.0 * (1 - lifeTime / maxLife);
+                
+                if (lifeTime < maxLife && spark.parent) {
+                    requestAnimationFrame(animateBlood);
+                } else {
+                    if (spark.parent) scene.remove(spark);
+                }
+            };
+            animateBlood();
+        }
+        
+        // スケール対応の衝撃波エフェクト
+        function createScaledImpactWave(position, scale = 1.0) {
+            const waveGeometry = new THREE.RingGeometry(0.2 * scale, 4 * scale, 16);
+            const waveMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff6600,
+                transparent: true,
+                opacity: 0.7,
+                emissive: 0xff6600,
+                emissiveIntensity: 1.2,
+                side: THREE.DoubleSide
+            });
+            const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+            wave.position.copy(position);
+            wave.rotation.x = -Math.PI / 2;
+            scene.add(wave);
+            
+            let waveTime = 0;
+            const animateWave = () => {
+                waveTime += 0.06;
+                wave.scale.setScalar(1 + waveTime * 3);
+                waveMaterial.opacity = Math.max(0, 0.7 - waveTime * 1.5);
+                waveMaterial.emissiveIntensity = 1.2 * (1 - waveTime);
+                
+                if (waveMaterial.opacity > 0.01) {
+                    requestAnimationFrame(animateWave);
+                } else {
+                    scene.remove(wave);
+                }
+            };
+            animateWave();
+        }
+        
+        // 勝者表示
+        function showWinner(winner) {
+            // 月を爆発させる
+            explodeMoon();
+            
+            // 従来の勝者表示を短時間表示
+            const winnerDiv = document.getElementById('winner');
+            winnerDiv.textContent = winner + ' の勝利！';
+            winnerDiv.style.display = 'block';
+            
+            // 2秒後に勝利メニューを表示
+            setTimeout(() => {
+                winnerDiv.style.display = 'none';
+                showVictoryMenu(winner);
+            }, 2000);
+        }
+        
+        // 勝利メニュー表示
+        function showVictoryMenu(winner) {
+            const victoryMenu = document.getElementById('victoryMenu');
+            const victoryTitle = document.getElementById('victoryTitle');
+            
+            victoryTitle.textContent = winner + ' の勝利！';
+            victoryMenu.style.display = 'flex';
+            
+            // ゲーム状態を勝利状態に変更
+            gameState = 'victory';
+        }
+        
+        // 勝利メニューを非表示
+        function hideVictoryMenu() {
+            const victoryMenu = document.getElementById('victoryMenu');
+            victoryMenu.style.display = 'none';
+        }
+        
+        // ゲーム再開始
+        function restartGame() {
+            hideVictoryMenu();
+            startGame();
+        }
+        
+        // 名前設定関数
+        function showNameSettings() {
+            console.log(`🏷️ プレイヤー名設定開始: 現在P1="${playerNames.player1}", P2="${playerNames.player2}"`);
+            
+            const player1Name = prompt("プレイヤー1の名前を入力してください:", playerNames.player1);
+            if (player1Name !== null && player1Name.trim() !== "") {
+                playerNames.player1 = player1Name.trim();
+                console.log(`✏️ P1名前変更: "${playerNames.player1}"`);
+            }
+            
+            const player2Name = prompt("プレイヤー2の名前を入力してください:", playerNames.player2);
+            if (player2Name !== null && player2Name.trim() !== "") {
+                playerNames.player2 = player2Name.trim();
+                console.log(`✏️ P2名前変更: "${playerNames.player2}"`);
+            }
+            
+            // UI表示を更新
+            updatePlayerNames();
+            
+            alert(`プレイヤー名が設定されました！\nプレイヤー1: ${playerNames.player1}\nプレイヤー2: ${playerNames.player2}`);
+            console.log(`✅ プレイヤー名設定完了`);
+        }
+        
+        // プレイヤー名表示を更新
+        function updatePlayerNames() {
+            console.log(`🔄 updatePlayerNames呼び出し: P1="${playerNames.player1}", P2="${playerNames.player2}"`);
+            
+            const player1NameDiv = document.querySelector('.player1 .playerName');
+            const player2NameDiv = document.querySelector('.player2 .playerName');
+            
+            if (player1NameDiv) {
+                player1NameDiv.textContent = playerNames.player1;
+                console.log(`📝 P1名前表示更新: "${playerNames.player1}"`);
+            } else {
+                console.log(`❌ P1名前要素が見つかりません`);
+            }
+            
+            if (player2NameDiv) {
+                player2NameDiv.textContent = playerNames.player2;
+                console.log(`📝 P2名前表示更新: "${playerNames.player2}"`);
+            } else {
+                console.log(`❌ P2名前要素が見つかりません`);
+            }
+        }
+        
+        // 入力処理
+        function handleInput() {
+            if (gameState !== 'playing') return;
+            
+            // オンラインモードでは自分のプレイヤーのみ制御
+            const canControlPlayer1 = !isOnlineMode || myPlayerNumber === 1;
+            const canControlPlayer2 = !isOnlineMode || myPlayerNumber === 2;
+            
+            // プレイヤー1
+            if (canControlPlayer1) {
+                if (keys['a'] || keys['A']) player1.move(-1);
+                else if (keys['d'] || keys['D']) player1.move(1);
+                else player1.move(0);
+                
+                if (keys['w'] || keys['W']) {
+                    if (!keyState.player1Jump) {
+                        keyState.player1Jump = true;
+                        player1.startJumpCharge();
+                    }
+                } else if (keyState.player1Jump) {
+                    keyState.player1Jump = false;
+                    if (!player1.jumpRapidFire) {
+                        player1.releaseJump();
+                    }
+                }
+                
+                if (keys['f'] || keys['F']) {
+                    if (!keyState.player1Attack) {
+                        keyState.player1Attack = true;
+                        player1.startCharge();
+                    }
+                } else if (keyState.player1Attack) {
+                    keyState.player1Attack = false;
+                    player1.releaseAttack();
+                }
+                
+                if (keys['g'] || keys['G']) {
+                    if (!keyState.player1Gun) {
+                        keyState.player1Gun = true;
+                        player1.startGunCharge();
+                    }
+                } else if (keyState.player1Gun) {
+                    keyState.player1Gun = false;
+                    if (!player1.gunRapidFire) {
+                        player1.releaseGun();
+                    }
+                }
+                
+                if (keys['q'] || keys['Q']) {
+                    if (!keyState.player1Ultimate) {
+                        keyState.player1Ultimate = true;
+                        player1.ultimate();
+                    }
+                } else {
+                    keyState.player1Ultimate = false;
+                }
+                
+                player1.defend(keys['s'] || keys['S'] || false);
+            }
+            
+            // プレイヤー2
+            if (canControlPlayer2) {
+                if (keys['ArrowLeft']) player2.move(-1);
+                else if (keys['ArrowRight']) player2.move(1);
+                else player2.move(0);
+                
+                if (keys['ArrowUp']) {
+                    if (!keyState.player2Jump) {
+                        keyState.player2Jump = true;
+                        player2.startJumpCharge();
+                    }
+                } else if (keyState.player2Jump) {
+                    keyState.player2Jump = false;
+                    if (!player2.jumpRapidFire) {
+                        player2.releaseJump();
+                    }
+                }
+                
+                if (keys['j'] || keys['J']) {
+                    if (!keyState.player2Attack) {
+                        keyState.player2Attack = true;
+                        player2.startCharge();
+                    }
+                } else if (keyState.player2Attack) {
+                    keyState.player2Attack = false;
+                    player2.releaseAttack();
+                }
+                
+                if (keys['k'] || keys['K']) {
+                    if (!keyState.player2Gun) {
+                        keyState.player2Gun = true;
+                        player2.startGunCharge();
+                    }
+                } else if (keyState.player2Gun) {
+                    keyState.player2Gun = false;
+                    if (!player2.gunRapidFire) {
+                        player2.releaseGun();
+                    }
+                }
+                
+                if (keys['o'] || keys['O']) {
+                    if (!keyState.player2Ultimate) {
+                        keyState.player2Ultimate = true;
+                        player2.ultimate();
+                    }
+                } else {
+                    keyState.player2Ultimate = false;
+                }
+                
+                player2.defend(keys['ArrowDown'] || false);
+            }
+        }
+        
+        // キーボードイベントリスナー
+        document.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+            
+            // Shiftキーの判定
+            if (e.key === 'Shift') {
+                if (e.location === KeyboardEvent.DOM_KEY_LOCATION_LEFT) {
+                    keys['LeftShift'] = true;
+                } else if (e.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT) {
+                    keys['RightShift'] = true;
+                }
+            }
+            
+            // メニュー画面でのキー操作
+            if (gameState === 'menu' && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                startGame();
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            keys[e.key] = false;
+            
+            // Shiftキーの判定
+            if (e.key === 'Shift') {
+                if (e.location === KeyboardEvent.DOM_KEY_LOCATION_LEFT) {
+                    keys['LeftShift'] = false;
+                } else if (e.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT) {
+                    keys['RightShift'] = false;
+                }
+            }
+        });
+        
+        // カメラ更新関数（スクリーンシェイク）
+        function updateCamera() {
+            if (screenShake.duration > 0) {
+                const shakeX = (Math.random() - 0.5) * screenShake.intensity;
+                const shakeY = (Math.random() - 0.5) * screenShake.intensity;
+                camera.position.x = shakeX;
+                camera.position.y = 10 + shakeY;
+                camera.position.z = 30;
+                screenShake.duration -= 0.016; // 約60FPSを想定
+                
+                // console.log(`📹 スクリーンシェイク実行中: X=${shakeX.toFixed(2)}, Y=${shakeY.toFixed(2)}, 残り時間=${screenShake.duration.toFixed(3)}`);
+            } else {
+                camera.position.set(0, 10, 30);
+            }
+            camera.lookAt(0, 0, 0);
+        }
+        
+        // ダメージ表示更新関数
+        function updateDamageNumbers(deltaTime) {
+            // 実装されていないため空の関数として定義
+        }
+        
+        // アニメーションループ
+        function animate(currentTime) {
+            if (gameState !== 'playing') {
+                animationRunning = false;
+                return;
+            }
+            
+            animationRunning = true;
+            requestAnimationFrame(animate);
+            
+            const deltaTime = (currentTime - lastTime) / 1000 * gameSpeed; // gameSpeedを適用
+            lastTime = currentTime;
+            frameCount++;
+            
+            if (deltaTime < 0.1 && gameState === 'playing') {
+                handleInput();
+                player1.update(deltaTime);
+                player2.update(deltaTime);
+                updateBullets(deltaTime);
+                updateParticles(deltaTime);
+                updateSpaceBackground(); // 宇宙背景のアニメーション
+                updateMoon(); // 月のアニメーション
+                updateDamageNumbers(deltaTime / gameSpeed); // ダメージ表示は通常速度
+                updateCamera(); // スクリーンシェイク
+                
+                // オンラインモードでプレイヤー状態を同期
+                if (isOnlineMode && frameCount % 3 === 0) { // 3フレームごとに送信
+                    sendPlayerState();
+                }
+            }
+            
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+                
+                // ダメージ表示を2Dオーバーレイで描画
+                renderDamageNumbers();
+            }
+        }
+        
+        // ダメージ表示レンダリング関数
+        function renderDamageNumbers() {
+            if (!renderer || !scene || !camera || damageNumbers.length === 0) return;
+            
+            const canvas = renderer.domElement;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            
+            damageNumbers.forEach(number => {
+                // 3D座標を2D画面座標に変換
+                const vector = new THREE.Vector3(number.x, number.y, 0);
+                vector.project(camera);
+                
+                const x = (vector.x * 0.5 + 0.5) * canvas.width;
+                const y = (vector.y * -0.5 + 0.5) * canvas.height;
+                
+                // ダメージ数値を描画
+                ctx.save();
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = `rgba(255, 255, 0, ${number.lifetime})`;
+                ctx.strokeStyle = `rgba(0, 0, 0, ${number.lifetime})`;
+                ctx.lineWidth = 2;
+                ctx.textAlign = 'center';
+                
+                const text = number.amount.toString();
+                ctx.strokeText(text, x, y);
+                ctx.fillText(text, x, y);
+                ctx.restore();
+            });
+        }
+        
+        // リサイズ対応
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>
