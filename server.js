@@ -14,6 +14,21 @@ const io = new Server(srv, {
 // 静的ファイルを配信（public/フォルダから）
 app.use(express.static('public'));
 
+// ルートパスのリダイレクト
+app.get('/', (req, res) => {
+    res.sendFile('game.html', { root: './public' });
+});
+
+// ヘルスチェック用エンドポイント
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK',
+        message: 'SMASH Online Game Server is running',
+        timestamp: new Date().toISOString(),
+        rooms: rooms.size
+    });
+});
+
 // ゲームルーム管理
 const rooms = new Map();
 
@@ -168,8 +183,29 @@ io.on('connection', (socket) => {
     });
 });
 
+// エラーハンドリング
+app.use((err, req, res, _next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ 
+        error: 'Internal server error',
+        message: err.message 
+    });
+});
+
+// 404ハンドリング
+app.use((req, res) => {
+    console.log(`404 - Path not found: ${req.path}`);
+    res.status(404).json({ 
+        error: 'Path not found',
+        path: req.path 
+    });
+});
+
 const PORT = process.env.PORT || 3000;
-srv.listen(PORT, () => {
-    console.log(`サーバーがポート ${PORT} で起動しました`);
-    console.log('ルーム管理システム準備完了');
+srv.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 SMASH Online Game Server started`);
+    console.log(`📡 Server running on port ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🎮 Room management system ready`);
+    console.log(`📁 Serving static files from ./public`);
 });
