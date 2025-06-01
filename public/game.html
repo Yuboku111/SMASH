@@ -1622,6 +1622,62 @@
                 });
             }
             
+            // ユーザー認証ボタンイベント
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+            const loginBackBtn = document.getElementById('loginBackBtn');
+            const registerBackBtn = document.getElementById('registerBackBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (loginButton) {
+                loginButton.addEventListener('click', showLoginModal);
+            }
+            
+            if (registerButton) {
+                registerButton.addEventListener('click', showRegisterModal);
+            }
+            
+            if (loginBackBtn) {
+                loginBackBtn.addEventListener('click', hideLoginModal);
+            }
+            
+            if (registerBackBtn) {
+                registerBackBtn.addEventListener('click', hideRegisterModal);
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+            
+            // フレンド関連ボタンイベント
+            const friendsButton = document.getElementById('friendsButton');
+            const friendsBackBtn = document.getElementById('friendsBackBtn');
+            const addFriendBtn = document.getElementById('addFriendBtn');
+            
+            if (friendsButton) {
+                friendsButton.addEventListener('click', showFriendsModal);
+            }
+            
+            if (friendsBackBtn) {
+                friendsBackBtn.addEventListener('click', hideFriendsModal);
+            }
+            
+            if (addFriendBtn) {
+                addFriendBtn.addEventListener('click', addFriend);
+            }
+            
+            // フォーム送信イベント
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+            }
+            
             // 勝利メニューボタンイベント
             const homeButton = document.getElementById('homeButton');
             const replayButton = document.getElementById('replayButton');
@@ -1661,6 +1717,9 @@
                     }
                 }
             });
+            
+            // ユーザー認証UI初期化
+            updateUserDisplay();
         });
         
         // ゲーム状態管理
@@ -1851,6 +1910,47 @@
                 alert(`プレイヤー ${playerNumber} が切断されました`);
                 backToMenu();
             });
+            
+            // ユーザー認証レスポンスハンドラー
+            socket.on('registerResponse', (response) => {
+                if (response.success) {
+                    alert('ユーザー登録が完了しました！');
+                    hideRegisterModal();
+                } else {
+                    alert('登録エラー: ' + response.message);
+                }
+            });
+            
+            socket.on('loginResponse', (response) => {
+                if (response.success) {
+                    currentUser = response.user;
+                    updateUserDisplay();
+                    hideLoginModal();
+                    alert('ログインしました！');
+                } else {
+                    alert('ログインエラー: ' + response.message);
+                }
+            });
+            
+            socket.on('logoutResponse', (response) => {
+                if (response.success) {
+                    currentUser = null;
+                    updateUserDisplay();
+                    alert('ログアウトしました');
+                }
+            });
+            
+            socket.on('addFriendResponse', (response) => {
+                if (response.success) {
+                    alert(response.message);
+                    if (currentUser) {
+                        currentUser.friends = response.friends;
+                        updateUserDisplay();
+                    }
+                } else {
+                    alert('フレンド追加エラー: ' + response.message);
+                }
+            });
         }
         
         // 接続状態表示更新
@@ -1935,6 +2035,174 @@
             }
             
             socket.emit('joinRoom', inputRoomId);
+        }
+        
+        // ユーザー認証関数
+        let currentUser = null;
+        
+        function showLoginModal() {
+            document.getElementById('loginMenu').style.display = 'flex';
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('loginMenu').style.display = 'none';
+            // フォームをクリア
+            document.getElementById('loginForm').reset();
+        }
+        
+        function showRegisterModal() {
+            document.getElementById('registerMenu').style.display = 'flex';
+        }
+        
+        function hideRegisterModal() {
+            document.getElementById('registerMenu').style.display = 'none';
+            // フォームをクリア
+            document.getElementById('registerForm').reset();
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('ユーザー名とパスワードを入力してください');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            socket.emit('login', {
+                username: username,
+                password: password
+            });
+        }
+        
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const email = document.getElementById('regEmail').value.trim();
+            
+            if (!username || !password) {
+                alert('ユーザー名とパスワードを入力してください');
+                return;
+            }
+            
+            if (username.length < 3) {
+                alert('ユーザー名は3文字以上である必要があります');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('パスワードは6文字以上である必要があります');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            socket.emit('register', {
+                username: username,
+                password: password,
+                email: email
+            });
+        }
+        
+        function logout() {
+            if (!socket || !socket.connected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            socket.emit('logout');
+        }
+        
+        function updateUserDisplay() {
+            const currentUserSpan = document.getElementById('currentUser');
+            const friendsButton = document.getElementById('friendsButton');
+            
+            if (currentUser) {
+                currentUserSpan.textContent = `ログイン中: ${currentUser.username}`;
+                // フレンズボタンを表示可能にする
+                if (friendsButton) {
+                    friendsButton.style.display = 'block';
+                }
+                updateFriendsList();
+            } else {
+                currentUserSpan.textContent = 'ログインしていません';
+                // フレンズボタンを非表示にする
+                if (friendsButton) {
+                    friendsButton.style.display = 'none';
+                }
+            }
+        }
+        
+        function showFriendsModal() {
+            if (!currentUser) {
+                alert('ログインが必要です');
+                return;
+            }
+            document.getElementById('friendsMenu').style.display = 'flex';
+            updateFriendsList();
+        }
+        
+        function hideFriendsModal() {
+            document.getElementById('friendsMenu').style.display = 'none';
+        }
+        
+        function addFriend() {
+            const friendUsername = document.getElementById('friendUsername').value.trim();
+            
+            if (!friendUsername) {
+                alert('フレンドのユーザー名を入力してください');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('ログインが必要です');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                alert('サーバーに接続されていません');
+                return;
+            }
+            
+            socket.emit('addFriend', {
+                friendUsername: friendUsername
+            });
+            
+            // 入力フィールドをクリア
+            document.getElementById('friendUsername').value = '';
+        }
+        
+        function updateFriendsList() {
+            const friendsList = document.getElementById('friendsList');
+            
+            if (!currentUser || !currentUser.friends) {
+                friendsList.innerHTML = '<p>フレンドがいません</p>';
+                return;
+            }
+            
+            if (currentUser.friends.length === 0) {
+                friendsList.innerHTML = '<p>フレンドがいません</p>';
+                return;
+            }
+            
+            let friendsHTML = '<h4>フレンド一覧:</h4>';
+            currentUser.friends.forEach(friend => {
+                friendsHTML += `<div class="friend-item">${friend}</div>`;
+            });
+            
+            friendsList.innerHTML = friendsHTML;
         }
         
         // 補間用データ
@@ -2322,11 +2590,12 @@
                     
                     // オンラインモードでダメージをブロードキャスト
                     if (isOnlineMode) {
+                        const adjustedDamage = isOnlineMode ? Math.floor(bullet.damage * 0.7) : bullet.damage;
                         sendDamage({
-                            damage: bullet.damage,
-                            type: 'gun',
+                            amount: adjustedDamage,
+                            attackType: 'gun',
                             targetPlayer: opponent.isPlayer1 ? 1 : 2,
-                            attackerPos: bullet.owner.mesh.position.clone(),
+                            attackerPosition: bullet.owner.mesh.position.clone(),
                             isCharged: bullet.isCharged
                         });
                     }
@@ -3853,10 +4122,10 @@
                     // オンラインモードでダメージをブロードキャスト
                     if (isOnlineMode) {
                         sendDamage({
-                            damage: damage,
-                            type: 'sword',
+                            amount: damage,
+                            attackType: 'sword',
                             targetPlayer: opponent.isPlayer1 ? 1 : 2,
-                            attackerPos: this.mesh.position.clone(),
+                            attackerPosition: this.mesh.position.clone(),
                             isCharged: isCharged
                         });
                     }
@@ -4081,11 +4350,12 @@
                         
                         // オンラインモードでダメージをブロードキャスト
                         if (isOnlineMode) {
+                            const ultimateDamage = isOnlineMode ? 35 : 50;
                             sendDamage({
-                                damage: 50,
-                                type: 'ultimate',
+                                amount: ultimateDamage,
+                                attackType: 'ultimate',
                                 targetPlayer: opponent.isPlayer1 ? 1 : 2,
-                                attackerPos: this.mesh.position.clone()
+                                attackerPosition: this.mesh.position.clone()
                             });
                         }
                         
