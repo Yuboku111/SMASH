@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 
 const app = express();
@@ -11,12 +12,27 @@ const io = new Server(srv, {
     }
 });
 
+// プロセスエラーハンドリング
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Rejection:', err);
+});
+
 // 静的ファイルを配信（public/フォルダから）
 app.use(express.static('public'));
 
 // ルートパスのリダイレクト
 app.get('/', (req, res) => {
-    res.sendFile('game.html', { root: './public' });
+    const filePath = path.join(__dirname, 'public', 'game.html');
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(500).send('Error loading game');
+        }
+    });
 });
 
 // ヘルスチェック用エンドポイント
@@ -202,10 +218,18 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-srv.listen(PORT, '0.0.0.0', () => {
+const HOST = process.env.HOST || '0.0.0.0';
+
+srv.listen(PORT, HOST, (err) => {
+    if (err) {
+        console.error('❌ Failed to start server:', err);
+        process.exit(1);
+    }
+    
     console.log(`🚀 SMASH Online Game Server started`);
-    console.log(`📡 Server running on port ${PORT}`);
+    console.log(`📡 Server running on ${HOST}:${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🎮 Room management system ready`);
-    console.log(`📁 Serving static files from ./public`);
+    console.log(`📁 Serving static files from: ${path.join(__dirname, 'public')}`);
+    console.log(`🔗 Access at: http://${HOST}:${PORT}`);
 });
