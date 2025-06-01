@@ -590,17 +590,43 @@
             gap: 30px;
         }
         
+        .match-result {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .result-status {
+            font-family: 'Orbitron', monospace;
+            font-size: 48px;
+            font-weight: 900;
+            text-shadow: 
+                0 0 15px currentColor,
+                0 0 30px currentColor;
+            animation: statusPulse 1.5s infinite;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .result-status.win {
+            color: #00ff00;
+        }
+        
+        .result-status.loss {
+            color: #ff0000;
+        }
+        
         .victory-title {
             font-family: 'Orbitron', monospace;
-            font-size: 36px;
+            font-size: 28px;
             font-weight: bold;
             margin: 0;
             padding: 0;
+            color: #00ffff;
             text-shadow: 
                 0 0 10px #00ffff,
-                0 0 20px #00ffff,
-                0 0 30px #ff00ff;
-            animation: winnerPulse 1s infinite;
+                0 0 20px #00ffff;
             text-align: center;
             white-space: nowrap;
             overflow: visible;
@@ -683,6 +709,53 @@
             box-shadow: 
                 0 0 20px rgba(0, 255, 102, 0.6),
                 inset 0 0 20px rgba(0, 255, 102, 0.2);
+        }
+        
+        .victory-button.next-match {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+        }
+        
+        .victory-button.next-match:hover {
+            border-color: #ff9900;
+            color: #ff9900;
+            text-shadow: 0 0 15px rgba(255, 153, 0, 1);
+            box-shadow: 
+                0 0 20px rgba(255, 153, 0, 0.6),
+                inset 0 0 20px rgba(255, 153, 0, 0.2);
+        }
+        
+        .next-match-status {
+            text-align: center;
+            color: #ffaa00;
+            font-family: 'Rajdhani', monospace;
+        }
+        
+        .next-match-status p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
+        .waiting-animation {
+            font-size: 24px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         /* 設定メニューのスタイル */
@@ -985,6 +1058,150 @@
             font-weight: bold;
             animation: pulse 2s infinite;
         }
+        
+        /* モーダルメニューのスタイル */
+        .modal-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #0a0a0a, #1a0d1a, #0d1a1a);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+        
+        .modal-content h2 {
+            font-family: 'Orbitron', monospace;
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #00ffff;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Rajdhani', monospace;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .friends-section, .friends-list {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        
+        .friends-section h3, .friends-list h3 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .friend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        
+        .friend-name {
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .friend-status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .friend-status.online {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .friend-status.offline {
+            background: #666;
+            color: #fff;
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .user-info p {
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
     </style>
 </head>
 <body>
@@ -997,6 +1214,9 @@
         <div class="menu-buttons">
             <button class="menu-button" id="startButton">ローカル対戦</button>
             <button class="menu-button" id="onlineButton">オンライン対戦</button>
+            <button class="menu-button" id="loginButton">ログイン</button>
+            <button class="menu-button" id="registerButton">ユーザー登録</button>
+            <button class="menu-button" id="friendsButton">フレンド</button>
             <button class="menu-button" id="controlsButton">操作説明</button>
             <button class="menu-button" id="nameButton">プレイヤー名設定</button>
         </div>
@@ -1004,6 +1224,77 @@
             <h3>基本操作</h3>
             <p>P1: AD移動 | W: ジャンプ | F: 攻撃 | G: 銃 | S: 防御 | Q: 必殺</p>
             <p>P2: ←→移動 | ↑: ジャンプ | J: 攻撃 | K: 銃 | ↓: 防御 | O: 必殺</p>
+        </div>
+    </div>
+    
+    <!-- ユーザー登録画面 -->
+    <div id="registerMenu" class="modal-menu" style="display: none;">
+        <div class="modal-content">
+            <h2>ユーザー登録</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">ユーザー名:</label>
+                    <input type="text" id="regUsername" required minlength="3" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">パスワード:</label>
+                    <input type="password" id="regPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">メールアドレス (任意):</label>
+                    <input type="email" id="regEmail">
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="menu-button">登録</button>
+                    <button type="button" class="menu-button" id="registerBackBtn">戻る</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ログイン画面 -->
+    <div id="loginMenu" class="modal-menu" style="display: none;">
+        <div class="modal-content">
+            <h2>ログイン</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">ユーザー名:</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">パスワード:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="menu-button">ログイン</button>
+                    <button type="button" class="menu-button" id="loginBackBtn">戻る</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- フレンド画面 -->
+    <div id="friendsMenu" class="modal-menu" style="display: none;">
+        <div class="modal-content">
+            <h2>フレンド管理</h2>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <p>ログインユーザー: <span id="currentUser"></span></p>
+                <button class="menu-button" id="logoutBtn">ログアウト</button>
+            </div>
+            <div class="friends-section">
+                <h3>フレンドを追加</h3>
+                <div class="form-group">
+                    <input type="text" id="friendUsername" placeholder="ユーザー名を入力">
+                    <button class="menu-button" id="addFriendBtn">追加</button>
+                </div>
+            </div>
+            <div class="friends-list">
+                <h3>フレンドリスト</h3>
+                <div id="friendsList"></div>
+            </div>
+            <div class="form-buttons">
+                <button class="menu-button" id="friendsBackBtn">戻る</button>
+            </div>
         </div>
     </div>
     
@@ -1109,10 +1400,18 @@
     <!-- 勝利メニュー -->
     <div id="victoryMenu">
         <div class="victory-content">
-            <div class="victory-title" id="victoryTitle">プレイヤー 1 の勝利！</div>
+            <div class="match-result">
+                <div class="result-status" id="resultStatus">YOU WIN!</div>
+                <div class="victory-title" id="victoryTitle">プレイヤー 1 の勝利！</div>
+            </div>
             <div class="victory-buttons">
-                <button class="victory-button home" id="homeButton">ホームに戻る</button>
+                <button class="victory-button next-match" id="nextMatchButton" style="display: none;">次のマッチ</button>
                 <button class="victory-button replay" id="replayButton">もう一度プレイ</button>
+                <button class="victory-button home" id="homeButton">ホームに戻る</button>
+            </div>
+            <div class="next-match-status" id="nextMatchStatus" style="display: none;">
+                <p>相手の準備を待っています...</p>
+                <div class="waiting-animation">⏳</div>
             </div>
             <div style="margin-top: 15px; font-size: 12px; color: #666; font-family: 'Rajdhani', monospace;">
                 Enter/Space: もう一度プレイ | Esc/Backspace: ホームに戻る
@@ -1249,13 +1548,11 @@
     <script>
         // メニュー制御
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded');
             
             // ロゴ読み込み処理
             const gameLogoImg = document.getElementById('gameLogo');
             if (gameLogoImg) {
                 gameLogoImg.addEventListener('error', function() {
-                    console.log('ロゴ画像の読み込みに失敗しました。フォールバックテキストを表示します。');
                     const logoContainer = document.querySelector('.logo-container');
                     logoContainer.innerHTML = '<div class="fallback-title">MOTHERLICKED</div>';
                     
@@ -1278,7 +1575,6 @@
                 });
                 
                 gameLogoImg.addEventListener('load', function() {
-                    console.log('ロゴ画像が正常に読み込まれました');
                 });
             }
             
@@ -1289,7 +1585,6 @@
             
             if (startButton) {
                 startButton.addEventListener('click', function() {
-                    console.log('Start button clicked');
                     isOnlineMode = false;
                     startGame();
                 });
@@ -1297,14 +1592,12 @@
             
             if (onlineButton) {
                 onlineButton.addEventListener('click', function() {
-                    console.log('Online button clicked');
                     showOnlineMenu();
                 });
             }
             
             if (controlsButton) {
                 controlsButton.addEventListener('click', function() {
-                    console.log('Controls button clicked');
                     showControls();
                 });
             }
@@ -1336,21 +1629,18 @@
             
             if (homeButton) {
                 homeButton.addEventListener('click', function() {
-                    console.log('Home button clicked');
                     returnToMenu();
                 });
             }
             
             if (replayButton) {
                 replayButton.addEventListener('click', function() {
-                    console.log('Replay button clicked');
                     restartGame();
                 });
             }
             
             if (nameButton) {
                 nameButton.addEventListener('click', function() {
-                    console.log('Name button clicked');
                     showNameSettings();
                 });
             }
@@ -1489,7 +1779,6 @@
                 oscillator.stop(audioContext.currentTime + duration);
                 
             } catch (error) {
-                console.log('音声再生エラー:', error);
             }
         }
         let damageNumbers = [];
@@ -1499,13 +1788,11 @@
             socket = io();
             
             socket.on('connect', () => {
-                console.log('サーバーに接続しました');
                 isConnected = true;
                 updateConnectionStatus('connected');
             });
             
             socket.on('disconnect', () => {
-                console.log('サーバーから切断されました');
                 isConnected = false;
                 updateConnectionStatus('disconnected');
             });
@@ -1513,7 +1800,6 @@
             socket.on('playerAssigned', (data) => {
                 myPlayerNumber = data.playerNumber;
                 roomId = data.roomId;
-                console.log(`プレイヤー ${myPlayerNumber} として参加, ルーム: ${roomId}`);
                 showRoomInfo();
             });
             
@@ -1522,7 +1808,6 @@
             });
             
             socket.on('gameStart', () => {
-                console.log('ゲーム開始!');
                 hideOnlineMenu();
                 isOnlineMode = true;
                 startGame();
@@ -1543,6 +1828,18 @@
             socket.on('playerDamage', (data) => {
                 if (isOnlineMode && data.playerNumber !== myPlayerNumber) {
                     handleRemoteDamage(data);
+                }
+            });
+            
+            socket.on('bulletCreate', (data) => {
+                if (isOnlineMode && data.ownerPlayer !== myPlayerNumber) {
+                    createRemoteBullet(data);
+                }
+            });
+            
+            socket.on('bulletDestroy', (data) => {
+                if (isOnlineMode) {
+                    destroyRemoteBullet(data.bulletId);
                 }
             });
             
@@ -1640,15 +1937,137 @@
             socket.emit('joinRoom', inputRoomId);
         }
         
-        // リモートプレイヤー更新
+        // 補間用データ
+        let remotePlayerTargetState = null;
+        let remotePlayerLastUpdate = 0;
+        let remotePlayerPreviousState = null;
+        
+        // リモートプレイヤー更新（補間付き）
         function updateRemotePlayer(data) {
             const remotePlayer = myPlayerNumber === 1 ? player2 : player1;
-            if (remotePlayer && data.state) {
-                remotePlayer.mesh.position.copy(data.state.position);
-                remotePlayer.velocity.copy(data.state.velocity);
-                remotePlayer.health = data.state.health;
-                remotePlayer.isDefending = data.state.isDefending;
-                remotePlayer.updateHealthBar();
+            if (!remotePlayer || !data.state) return;
+            
+            const now = performance.now();
+            
+            // 前の状態を保存
+            if (remotePlayerTargetState) {
+                remotePlayerPreviousState = {
+                    position: remotePlayer.mesh.position.clone(),
+                    velocity: remotePlayer.velocity.clone(),
+                    rotation: remotePlayer.mesh.rotation.y
+                };
+            }
+            
+            // 新しいターゲット状態を設定
+            remotePlayerTargetState = {
+                position: new THREE.Vector3(data.state.position.x, data.state.position.y, data.state.position.z),
+                velocity: new THREE.Vector3(data.state.velocity.x, data.state.velocity.y, data.state.velocity.z),
+                health: data.state.health,
+                isDefending: data.state.isDefending,
+                specialGauge: data.state.specialGauge,
+                rotation: data.state.rotation || 0,
+                timestamp: data.state.timestamp || now
+            };
+            
+            remotePlayerLastUpdate = now;
+            
+            // 即座に更新する値
+            remotePlayer.health = data.state.health;
+            remotePlayer.isDefending = data.state.isDefending;
+            remotePlayer.specialGauge = data.state.specialGauge;
+            remotePlayer.updateHealthBar();
+        }
+        
+        // リモートプレイヤーの補間更新
+        function interpolateRemotePlayer() {
+            const remotePlayer = myPlayerNumber === 1 ? player2 : player1;
+            if (!remotePlayer || !remotePlayerTargetState) return;
+            
+            const now = performance.now();
+            const timeSinceUpdate = now - remotePlayerLastUpdate;
+            const maxInterpolationTime = 100; // 100ms以内で補間
+            
+            if (timeSinceUpdate > maxInterpolationTime) {
+                // 時間が経ちすぎた場合は直接設定
+                remotePlayer.mesh.position.copy(remotePlayerTargetState.position);
+                remotePlayer.velocity.copy(remotePlayerTargetState.velocity);
+                remotePlayer.mesh.rotation.y = remotePlayerTargetState.rotation;
+            } else if (remotePlayerPreviousState) {
+                // 補間
+                const t = Math.min(timeSinceUpdate / maxInterpolationTime, 1);
+                
+                remotePlayer.mesh.position.lerpVectors(
+                    remotePlayerPreviousState.position, 
+                    remotePlayerTargetState.position, 
+                    t
+                );
+                
+                remotePlayer.velocity.lerpVectors(
+                    remotePlayerPreviousState.velocity, 
+                    remotePlayerTargetState.velocity, 
+                    t
+                );
+                
+                // 回転の補間
+                const rotDiff = remotePlayerTargetState.rotation - remotePlayerPreviousState.rotation;
+                remotePlayer.mesh.rotation.y = remotePlayerPreviousState.rotation + rotDiff * t;
+            }
+        }
+        
+        // リモート弾丸作成
+        function createRemoteBullet(data) {
+            const remotePlayer = myPlayerNumber === 1 ? player2 : player1;
+            if (!remotePlayer) return;
+            
+            // 弾丸のジオメトリとマテリアル
+            const bulletSize = data.isCharged ? 0.4 : 0.2;
+            const bulletGeometry = new THREE.SphereGeometry(bulletSize, 8, 8);
+            const bulletMaterial = new THREE.MeshPhongMaterial({ 
+                color: data.isCharged ? 0xffff00 : 0xff6600,
+                emissive: data.isCharged ? 0xffff00 : 0xff6600,
+                emissiveIntensity: data.isCharged ? 0.8 : 0.4
+            });
+            
+            const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+            bullet.position.set(data.position.x, data.position.y, data.position.z);
+            
+            // エフェクト追加
+            if (data.isCharged) {
+                const glowGeometry = new THREE.SphereGeometry(bulletSize * 2, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                bullet.add(glow);
+            }
+            
+            scene.add(bullet);
+            
+            // 弾丸データを追加
+            const bulletData = {
+                mesh: bullet,
+                velocity: new THREE.Vector3(data.velocity.x, data.velocity.y, data.velocity.z),
+                owner: remotePlayer,
+                damage: data.damage,
+                isCharged: data.isCharged,
+                id: data.bulletId,
+                isRemote: true,
+                startTime: data.timestamp
+            };
+            
+            bullets.push(bulletData);
+        }
+        
+        // リモート弾丸破棄
+        function destroyRemoteBullet(bulletId) {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                if (bullets[i].id === bulletId) {
+                    scene.remove(bullets[i].mesh);
+                    bullets.splice(i, 1);
+                    break;
+                }
             }
         }
         
@@ -1710,22 +2129,84 @@
             }
         }
         
-        // プレイヤー状態を送信
-        function sendPlayerState() {
-            if (isOnlineMode && socket && isConnected) {
-                const localPlayer = myPlayerNumber === 1 ? player1 : player2;
-                if (localPlayer) {
-                    const state = {
-                        position: localPlayer.mesh.position,
-                        velocity: localPlayer.velocity,
-                        health: localPlayer.health,
-                        isDefending: localPlayer.isDefending,
-                        specialGauge: localPlayer.specialGauge
-                    };
-                    
-                    socket.emit('playerState', state);
-                }
+        // 高速同期用変数
+        let lastSyncTime = 0;
+        let syncInterval = 1000 / 60; // 60FPS同期
+        let lastPlayerState = {};
+        
+        // パフォーマンス監視
+        let fpsStats = {
+            frameCount: 0,
+            lastTime: performance.now(),
+            currentFPS: 60,
+            targetFPS: 60
+        };
+        
+        // 動的品質調整
+        function adjustQuality() {
+            if (fpsStats.currentFPS < 45) {
+                // FPSが低い場合は品質を下げる
+                syncInterval = 1000 / 30; // 30FPSに下げる
+            } else if (fpsStats.currentFPS > 55) {
+                // FPSが安定している場合は60FPSを維持
+                syncInterval = 1000 / 60;
             }
+        }
+        
+        // プレイヤー状態を送信（60FPS）
+        function sendPlayerState(force = false) {
+            if (!isOnlineMode || !socket || !isConnected) return;
+            
+            const now = performance.now();
+            if (!force && (now - lastSyncTime) < syncInterval) return;
+            
+            const localPlayer = myPlayerNumber === 1 ? player1 : player2;
+            if (!localPlayer) return;
+            
+            const state = {
+                position: {
+                    x: Math.round(localPlayer.mesh.position.x * 100) / 100,
+                    y: Math.round(localPlayer.mesh.position.y * 100) / 100,
+                    z: Math.round(localPlayer.mesh.position.z * 100) / 100
+                },
+                velocity: {
+                    x: Math.round(localPlayer.velocity.x * 100) / 100,
+                    y: Math.round(localPlayer.velocity.y * 100) / 100,
+                    z: Math.round(localPlayer.velocity.z * 100) / 100
+                },
+                health: localPlayer.health,
+                isDefending: localPlayer.isDefending,
+                specialGauge: localPlayer.specialGauge,
+                rotation: Math.round(localPlayer.mesh.rotation.y * 100) / 100,
+                timestamp: now
+            };
+            
+            // 状態変化があるか確認（帯域幅節約）
+            if (force || hasStateChanged(state, lastPlayerState)) {
+                socket.emit('playerState', state);
+                lastPlayerState = {...state};
+                lastSyncTime = now;
+            }
+        }
+        
+        // 状態変化を検出
+        function hasStateChanged(newState, oldState) {
+            if (!oldState.position) return true;
+            
+            const posThreshold = 0.01;
+            const velThreshold = 0.05;
+            
+            return (
+                Math.abs(newState.position.x - oldState.position.x) > posThreshold ||
+                Math.abs(newState.position.y - oldState.position.y) > posThreshold ||
+                Math.abs(newState.position.z - oldState.position.z) > posThreshold ||
+                Math.abs(newState.velocity.x - oldState.velocity.x) > velThreshold ||
+                Math.abs(newState.velocity.y - oldState.velocity.y) > velThreshold ||
+                Math.abs(newState.velocity.z - oldState.velocity.z) > velThreshold ||
+                newState.isDefending !== oldState.isDefending ||
+                Math.abs(newState.health - oldState.health) > 0.1 ||
+                Math.abs(newState.specialGauge - oldState.specialGauge) > 0.1
+            );
         }
         
         // 攻撃を送信
@@ -1787,7 +2268,6 @@
         };
         
         function startGame() {
-            console.log('Starting game...');
             
             if (!gameInitialized) {
                 initializeGame();
@@ -1839,7 +2319,6 @@
                 const distance = bullet.mesh.position.distanceTo(opponent.mesh.position);
                 
                 if (distance < 2.5) {
-                    console.log(`🔫 銃弾ヒット: ダメージ=${bullet.damage}, チャージ=${bullet.isCharged}, 距離=${distance.toFixed(2)}`);
                     
                     // オンラインモードでダメージをブロードキャスト
                     if (isOnlineMode) {
@@ -1852,13 +2331,19 @@
                         });
                     }
                     
-                    // 弾丸のダメージとノックバック
-                    opponent.takeDamage(bullet.damage, bullet.owner.mesh.position, bullet.owner);
+                    // 弾丸のダメージとノックバック（オンライン対戦では調整）
+                    const adjustedDamage = isOnlineMode ? Math.floor(bullet.damage * 0.7) : bullet.damage;
+                    opponent.takeDamage(adjustedDamage, bullet.owner.mesh.position, bullet.owner);
                     
                     createHitEffect(opponent.mesh.position, opponent.isDefending, 'gun', bullet.damage);
                     
                     if (bullet.isCharged) {
                         createUltimateEffect(opponent.mesh.position, 0xffff00);
+                    }
+                    
+                    // 弾丸削除を同期
+                    if (isOnlineMode && socket && isConnected && bullet.id && !bullet.isRemote) {
+                        socket.emit('bulletDestroy', { bulletId: bullet.id });
                     }
                     
                     scene.remove(bullet.mesh);
@@ -1872,6 +2357,11 @@
                 
                 // 画面外削除
                 if (Math.abs(bullet.mesh.position.x) > 30) {
+                    // 弾丸削除を同期
+                    if (isOnlineMode && socket && isConnected && bullet.id && !bullet.isRemote) {
+                        socket.emit('bulletDestroy', { bulletId: bullet.id });
+                    }
+                    
                     scene.remove(bullet.mesh);
                     bullets.splice(i, 1);
                 }
@@ -1896,7 +2386,6 @@
         }
         
         function initializeGame() {
-            console.log('Initializing game...');
             
             scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x000000, 10, 100);
@@ -1953,7 +2442,6 @@
             player2 = new Player(0xff3366, 10, false);
             
             gameInitialized = true;
-            console.log('Game initialized');
         }
         
         function resetPlayers() {
@@ -2159,10 +2647,8 @@
                     skybox.position.set(0, 0, 0);
                     scene.add(skybox);
                     
-                    console.log('背景画像が正常に読み込まれました');
                 },
                 function(progress) {
-                    console.log('背景画像読み込み中...', (progress.loaded / progress.total * 100) + '%');
                 },
                 function(error) {
                     console.error('背景画像の読み込みに失敗しました:', error);
@@ -2277,7 +2763,6 @@
             moon.receiveShadow = false;
             scene.add(moon);
             
-            console.log('月が作成されました');
         }
         
         // 月のアニメーション更新
@@ -2293,7 +2778,6 @@
         function explodeMoon() {
             if (!moon) return;
             
-            console.log('月が爆発します！');
             
             // 月の位置を記録
             const moonPosition = moon.position.clone();
@@ -2332,7 +2816,7 @@
             expandFlash();
             
             // 月の破片スパーク（灰色と白）
-            for (let i = 0; i < 200; i++) {
+            for (let i = 0; i < 80; i++) {
                 const velocity = new THREE.Vector3(
                     (Math.random() - 0.5) * 60,
                     Math.random() * 40 + 10,
@@ -2343,7 +2827,7 @@
             }
             
             // エネルギー爆発（オレンジと黄色）
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 60; i++) {
                 const velocity = new THREE.Vector3(
                     (Math.random() - 0.5) * 50,
                     Math.random() * 35 + 5,
@@ -2355,7 +2839,7 @@
             
             // 遅延爆発
             setTimeout(() => {
-                for (let i = 0; i < 100; i++) {
+                for (let i = 0; i < 40; i++) {
                     const velocity = new THREE.Vector3(
                         (Math.random() - 0.5) * 40,
                         Math.random() * 30,
@@ -2404,7 +2888,6 @@
         
         // 強化されたヒットエフェクト関数
         function createHitEffect(position, isBlocked = false, attackType = 'normal', damage = 10) {
-            console.log('createHitEffect called:', position, isBlocked, attackType, damage);
             
             const color = isBlocked ? 0x00ffff : 0xff6600;
             
@@ -2727,7 +3210,6 @@
         
         // スパーク生成関数
         function createSpark(position, color, velocity, life = 0.5) {
-            console.log('createSpark called:', position, color); // デバッグ用
             
             const sparkGeometry = new THREE.SphereGeometry(0.025, 6, 6); // 0.05 → 0.025に縮小
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
@@ -2761,7 +3243,6 @@
         
         // 血のスパーク生成関数
         function createBloodSpark(position, velocity) {
-            console.log('createBloodSpark called:', position); // デバッグ用
             
             const bloodColors = [0x8B0000, 0xDC143C, 0xB22222]; // 濃い赤、深紅、暗い赤
             const color = bloodColors[Math.floor(Math.random() * bloodColors.length)];
@@ -2797,7 +3278,6 @@
         }
         
         function createUltimateEffect(position, color) {
-            console.log('Ultimate effect triggered!');
             
             // 巨大な爆発フラッシュ（画面を照らす）
             const flashGeometry = new THREE.SphereGeometry(8, 16, 16);
@@ -2825,7 +3305,7 @@
             expandFlash();
             
             // 巨大スパーク爆発（第1波）
-            for (let i = 0; i < 120; i++) {
+            for (let i = 0; i < 50; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const speed = Math.random() * 30 + 15;
                 const velocity = new THREE.Vector3(
@@ -3227,7 +3707,6 @@
                 // ノックバック中は減衰をほぼ無効化、通常時は強く減衰
                 if (this.knockbackTimer > 0) {
                     this.velocity.x *= 0.995; // ノックバック中はほぼ減衰なし
-                    // console.log(`⚡ノックバック中: 横速度=${this.velocity.x}, 位置=${this.mesh.position.x}, タイマー=${this.knockbackTimer.toFixed(2)}`);
                 } else {
                     this.velocity.x *= 0.88; // 通常時は強い減衰
                 }
@@ -3365,10 +3844,11 @@
                 const distance = this.mesh.position.distanceTo(opponent.mesh.position);
                 
                 if (distance < (isCharged ? 10 : 8)) { // 攻撃範囲を拡大
-                    const damage = isCharged ? 45 : 22; // 1.5倍に調整 (30→45, 15→22)
+                    // オンライン対戦では攻撃力を調整
+                    const baseDamage = isCharged ? 45 : 22;
+                    const damage = isOnlineMode ? Math.floor(baseDamage * 0.7) : baseDamage; // オンライン時は30%減少
                     const knockback = isCharged ? 25 : 10;
                     
-                    console.log(`⚔️ 剣攻撃ヒット: ダメージ=${damage}, チャージ=${isCharged}, 距離=${distance.toFixed(2)}`);
                     
                     // オンラインモードでダメージをブロードキャスト
                     if (isOnlineMode) {
@@ -3542,14 +4022,39 @@
                 trail.position.x = -direction * trailLength / 2;
                 
                 scene.add(bullet);
-                bullets.push({
+                const bulletData = {
                     mesh: bullet,
                     velocity: new THREE.Vector3(direction * speed, 0, 0),
                     owner: this,
                     damage: damage,
                     knockback: knockback,
-                    isCharged: isCharged
-                });
+                    isCharged: isCharged,
+                    id: Math.random().toString(36).substring(7), // ユニークID
+                    startTime: performance.now()
+                };
+                
+                bullets.push(bulletData);
+                
+                // オンライン対戦で弾丸を同期
+                if (isOnlineMode && socket && isConnected) {
+                    socket.emit('bulletCreate', {
+                        position: {
+                            x: bullet.position.x,
+                            y: bullet.position.y,
+                            z: bullet.position.z
+                        },
+                        velocity: {
+                            x: bulletData.velocity.x,
+                            y: bulletData.velocity.y,
+                            z: bulletData.velocity.z
+                        },
+                        isCharged: isCharged,
+                        damage: damage,
+                        ownerPlayer: this.isPlayer1 ? 1 : 2,
+                        bulletId: bulletData.id,
+                        timestamp: bulletData.startTime
+                    });
+                }
             }
             
             shoot() {
@@ -3573,7 +4078,6 @@
                     const distance = this.mesh.position.distanceTo(opponent.mesh.position);
                     
                     if (distance < 15) {
-                        console.log(`💥 必殺技ヒット: ダメージ=50, 距離=${distance.toFixed(2)}`);
                         
                         // オンラインモードでダメージをブロードキャスト
                         if (isOnlineMode) {
@@ -3594,7 +4098,9 @@
                         screenShake.intensity = 2;
                         screenShake.duration = 0.5;
                         
-                        opponent.takeDamage(50, this.mesh.position, this);
+                        // 必殺技ダメージ（オンライン対戦では調整）
+                        const ultimateDamage = isOnlineMode ? 35 : 50; // オンライン時は30%減少
+                        opponent.takeDamage(ultimateDamage, this.mesh.position, this);
                         
                         createHitEffect(opponent.mesh.position, opponent.isDefending, 'ultimate', 50);
                         createUltimateEffect(opponent.mesh.position, this.color);
@@ -3712,14 +4218,12 @@
                         comboDisplay.style.animation = 'comboFloat 0.5s ease-out';
                     }, 10);
                     
-                    console.log(`🔥 ${this.isPlayer1 ? 'P1' : 'P2'} COMBO: ${this.comboCount} HITS!`);
                 } else {
                     comboDisplay.className = `combo-display ${this.isPlayer1 ? 'player1' : 'player2'}`;
                 }
             }
             
             showDamageNumber(amount) {
-                console.log(`💥 showDamageNumber呼び出し: ${amount}ダメージ, プレイヤー=${this.isPlayer1 ? 'P1' : 'P2'}`);
                 
                 const damageDiv = document.createElement('div');
                 damageDiv.className = 'damage-number';
@@ -3743,7 +4247,6 @@
                 damageDiv.style.left = (x - 12) + 'px'; // 中央揃え調整
                 damageDiv.style.top = (y - 30) + 'px';
                 
-                console.log(`📍 ダメージ表示位置: (${x}, ${y}), DOM要素作成完了`);
                 
                 document.body.appendChild(damageDiv);
                 
@@ -3754,36 +4257,29 @@
                 setTimeout(() => {
                     if (damageDiv.parentNode) {
                         damageDiv.parentNode.removeChild(damageDiv);
-                        console.log(`🗑️ ダメージ表示削除: ${amount}`);
                     }
                 }, 1000);
                 
-                console.log(`✅ ダメージ表示完了: ${amount}`);
             }
             
             takeDamage(amount, attackerPosition = null, attacker = null) {
-                console.log(`💢 takeDamage呼び出し: ダメージ=${amount}, 防御中=${this.isDefending}, 攻撃者=${attacker ? (attacker.isPlayer1 ? 'P1' : 'P2') : 'なし'}`);
                 
                 if (this.isDefending) {
                     amount *= 0.2; // 80%防御（20%のダメージのみ受ける）
-                    console.log(`🛡️ 防御により軽減: ${amount}ダメージ`);
                 } else {
                     // ヒットストップ効果（防御していない場合のみ）
                     gameSpeed = 0.2;
                     setTimeout(() => {
                         gameSpeed = 1.0;
                     }, 100);
-                    console.log(`⚡ ヒットストップ発動: ${amount}ダメージ`);
                     
                     // スクリーンシェイク
                     screenShake.intensity = amount * 0.1;
                     screenShake.duration = 0.2;
-                    console.log(`🌪️ スクリーンシェイク: 強度${screenShake.intensity.toFixed(2)}`);
                     
                     // 攻撃者のコンボカウント
                     if (attacker) {
                         attacker.addCombo();
-                        console.log(`🔥 コンボ追加: ${attacker.isPlayer1 ? 'P1' : 'P2'} -> ${attacker.comboCount}`);
                     }
                 }
                 
@@ -3814,7 +4310,6 @@
                     // ノックバック保護タイマーを設定（1.5秒間減衰を弱く）
                     this.knockbackTimer = 1.5;
                     
-                    console.log(`🚀ノックバック適用: ダメージ=${amount}, 方向=${knockbackDirection}, 横速度=${this.velocity.x}, 縦速度=${this.velocity.y}, 位置=${this.mesh.position.x}`);
                 }
                 
                 createHitEffect(this.mesh.position, this.isDefending);
@@ -4188,46 +4683,37 @@
         
         // 名前設定関数
         function showNameSettings() {
-            console.log(`🏷️ プレイヤー名設定開始: 現在P1="${playerNames.player1}", P2="${playerNames.player2}"`);
             
             const player1Name = prompt("プレイヤー1の名前を入力してください:", playerNames.player1);
             if (player1Name !== null && player1Name.trim() !== "") {
                 playerNames.player1 = player1Name.trim();
-                console.log(`✏️ P1名前変更: "${playerNames.player1}"`);
             }
             
             const player2Name = prompt("プレイヤー2の名前を入力してください:", playerNames.player2);
             if (player2Name !== null && player2Name.trim() !== "") {
                 playerNames.player2 = player2Name.trim();
-                console.log(`✏️ P2名前変更: "${playerNames.player2}"`);
             }
             
             // UI表示を更新
             updatePlayerNames();
             
             alert(`プレイヤー名が設定されました！\nプレイヤー1: ${playerNames.player1}\nプレイヤー2: ${playerNames.player2}`);
-            console.log(`✅ プレイヤー名設定完了`);
         }
         
         // プレイヤー名表示を更新
         function updatePlayerNames() {
-            console.log(`🔄 updatePlayerNames呼び出し: P1="${playerNames.player1}", P2="${playerNames.player2}"`);
             
             const player1NameDiv = document.querySelector('.player1 .playerName');
             const player2NameDiv = document.querySelector('.player2 .playerName');
             
             if (player1NameDiv) {
                 player1NameDiv.textContent = playerNames.player1;
-                console.log(`📝 P1名前表示更新: "${playerNames.player1}"`);
             } else {
-                console.log(`❌ P1名前要素が見つかりません`);
             }
             
             if (player2NameDiv) {
                 player2NameDiv.textContent = playerNames.player2;
-                console.log(`📝 P2名前表示更新: "${playerNames.player2}"`);
             } else {
-                console.log(`❌ P2名前要素が見つかりません`);
             }
         }
         
@@ -4387,7 +4873,6 @@
                 camera.position.z = 30;
                 screenShake.duration -= 0.016; // 約60FPSを想定
                 
-                // console.log(`📹 スクリーンシェイク実行中: X=${shakeX.toFixed(2)}, Y=${shakeY.toFixed(2)}, 残り時間=${screenShake.duration.toFixed(3)}`);
             } else {
                 camera.position.set(0, 10, 30);
             }
@@ -4413,6 +4898,15 @@
             lastTime = currentTime;
             frameCount++;
             
+            // FPS監視と動的品質調整
+            fpsStats.frameCount++;
+            if (currentTime - fpsStats.lastTime >= 1000) {
+                fpsStats.currentFPS = fpsStats.frameCount;
+                fpsStats.frameCount = 0;
+                fpsStats.lastTime = currentTime;
+                adjustQuality();
+            }
+            
             if (deltaTime < 0.1 && gameState === 'playing') {
                 handleInput();
                 player1.update(deltaTime);
@@ -4424,9 +4918,10 @@
                 updateDamageNumbers(deltaTime / gameSpeed); // ダメージ表示は通常速度
                 updateCamera(); // スクリーンシェイク
                 
-                // オンラインモードでプレイヤー状態を同期
-                if (isOnlineMode && frameCount % 3 === 0) { // 3フレームごとに送信
-                    sendPlayerState();
+                // オンラインモードでプレイヤー状態を高速同期（60FPS）
+                if (isOnlineMode) {
+                    sendPlayerState(); // 自動的に60FPS制限される
+                    interpolateRemotePlayer(); // 相手プレイヤーの補間
                 }
             }
             

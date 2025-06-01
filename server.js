@@ -140,6 +140,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    // 弾丸作成イベント
+    socket.on('bulletCreate', (data) => {
+        if (socket.roomId) {
+            socket.to(socket.roomId).emit('bulletCreate', data);
+        }
+    });
+    
+    // 弾丸削除イベント
+    socket.on('bulletDestroy', (data) => {
+        if (socket.roomId) {
+            socket.to(socket.roomId).emit('bulletDestroy', data);
+        }
+    });
+    
     // 勝利イベント
     socket.on('victory', (data) => {
         if (socket.roomId) {
