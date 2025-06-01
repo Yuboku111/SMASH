@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D バトルファイター</title>
+    <title>SMASH DUDES</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
         
@@ -88,6 +88,57 @@
                     drop-shadow(0 0 15px rgba(255, 0, 255, 0.8))
                     drop-shadow(0 0 25px rgba(0, 255, 255, 0.6))
                     drop-shadow(0 0 40px rgba(255, 0, 255, 0.4));
+            }
+        }
+        
+        .game-title {
+            font-family: 'Orbitron', 'Rajdhani', monospace;
+            font-size: 120px;
+            font-weight: 900;
+            text-align: center;
+            line-height: 0.9;
+            margin: 0;
+            color: #ffffff;
+            text-shadow: 
+                0 0 10px rgba(255, 69, 0, 0.8),
+                0 0 20px rgba(255, 140, 0, 0.6),
+                0 0 30px rgba(255, 69, 0, 0.4),
+                0 0 40px rgba(255, 0, 0, 0.3),
+                2px 2px 0px #000,
+                -2px -2px 0px #000,
+                2px -2px 0px #000,
+                -2px 2px 0px #000;
+            background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700, #ff6347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+            filter: 
+                drop-shadow(0 0 15px rgba(255, 69, 0, 0.8))
+                drop-shadow(0 0 25px rgba(255, 140, 0, 0.6));
+        }
+        
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 
+                    0 0 10px rgba(255, 69, 0, 0.8),
+                    0 0 20px rgba(255, 140, 0, 0.6),
+                    0 0 30px rgba(255, 69, 0, 0.4),
+                    2px 2px 0px #000,
+                    -2px -2px 0px #000,
+                    2px -2px 0px #000,
+                    -2px 2px 0px #000;
+            }
+            100% {
+                text-shadow: 
+                    0 0 20px rgba(255, 69, 0, 1),
+                    0 0 30px rgba(255, 140, 0, 0.8),
+                    0 0 40px rgba(255, 69, 0, 0.6),
+                    0 0 50px rgba(255, 0, 0, 0.4),
+                    2px 2px 0px #000,
+                    -2px -2px 0px #000,
+                    2px -2px 0px #000,
+                    -2px 2px 0px #000;
             }
         }
         
@@ -931,7 +982,7 @@
     <!-- メニュー画面 -->
     <div id="menu">
         <div class="logo-container">
-            <img src="./logo.png" alt="MOTHERLICKED" class="game-logo" id="gameLogo">
+            <h1 class="game-title">SMASH<br>DUDES</h1>
         </div>
         <div class="menu-subtitle">ULTIMATE COMBAT EXPERIENCE</div>
         <div class="menu-buttons">
@@ -2246,9 +2297,7 @@
             const flashMaterial = new THREE.MeshBasicMaterial({ 
                 color: 0xFFFFFF,
                 transparent: true,
-                opacity: 1,
-                emissive: 0xFFFFFF,
-                emissiveIntensity: 5.0
+                opacity: 1
             });
             const flash = new THREE.Mesh(flashGeometry, flashMaterial);
             flash.position.copy(position);
@@ -2259,7 +2308,6 @@
                 flashScale += 3.0;
                 flash.scale.setScalar(flashScale);
                 flashMaterial.opacity *= 0.9;
-                flashMaterial.emissiveIntensity *= 0.95;
                 if (flashMaterial.opacity > 0.01) {
                     requestAnimationFrame(expandFlash);
                 } else {
@@ -2309,9 +2357,7 @@
             const fragmentMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 0.3
+                opacity: 1
             });
             const fragment = new THREE.Mesh(fragmentGeometry, fragmentMaterial);
             fragment.position.copy(position);
@@ -2366,9 +2412,7 @@
             const shieldMaterial = new THREE.MeshBasicMaterial({ 
                 color: 0x00ffff,
                 transparent: true,
-                opacity: 0.7,
-                emissive: 0x00ffff,
-                emissiveIntensity: 1.0
+                opacity: 0.7
             });
             const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
             shield.position.copy(position);
@@ -2379,7 +2423,6 @@
                 shieldScale += 0.15;
                 shield.scale.setScalar(shieldScale);
                 shieldMaterial.opacity *= 0.9;
-                shieldMaterial.emissiveIntensity *= 0.95;
                 
                 if (shieldMaterial.opacity > 0.05) {
                     requestAnimationFrame(animateShield);
@@ -2450,9 +2493,7 @@
             const flashMaterial = new THREE.MeshBasicMaterial({ 
                 color: 0xff6600,
                 transparent: true,
-                opacity: 1,
-                emissive: 0xff6600,
-                emissiveIntensity: 2.5
+                opacity: 1
             });
             const flash = new THREE.Mesh(flashGeometry, flashMaterial);
             flash.position.copy(position);
@@ -2463,7 +2504,6 @@
                 flashTime += 0.08;
                 flash.scale.setScalar(1 + flashTime * 2.5);
                 flashMaterial.opacity = Math.max(0, 1 - flashTime * 2.5);
-                flashMaterial.emissiveIntensity = 2.5 * (1 - flashTime);
                 
                 if (flashMaterial.opacity > 0.01) {
                     requestAnimationFrame(animateFlash);
@@ -2520,9 +2560,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: 0x88ffff,
                 transparent: true,
-                opacity: 1,
-                emissive: 0x88ffff,
-                emissiveIntensity: 2.0
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2537,7 +2575,6 @@
             const animateElectric = () => {
                 life += 0.1;
                 sparkMaterial.opacity = Math.max(0, 1 - life * 2);
-                sparkMaterial.emissiveIntensity = 2.0 * (1 - life);
                 
                 if (life < 0.5) {
                     requestAnimationFrame(animateElectric);
@@ -2555,8 +2592,6 @@
                 color: 0xff9900,
                 transparent: true,
                 opacity: 0.6,
-                emissive: 0xff9900,
-                emissiveIntensity: 1.0,
                 side: THREE.DoubleSide
             });
             const wave = new THREE.Mesh(waveGeometry, waveMaterial);
@@ -2585,9 +2620,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 2.0 // 2.5 → 2.0に調整
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2603,7 +2636,6 @@
                 
                 lifeTime += 0.03;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 2.0 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animateBigSpark);
@@ -2623,9 +2655,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.2 // 1.5 → 1.2に調整
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2641,7 +2671,6 @@
                 
                 lifeTime += 0.025;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 1.2 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animateBigBlood);
@@ -2659,8 +2688,6 @@
                 color: 0xff6600,
                 transparent: true,
                 opacity: 0.8,
-                emissive: 0xff6600,
-                emissiveIntensity: 1.5,
                 side: THREE.DoubleSide
             });
             const wave = new THREE.Mesh(waveGeometry, waveMaterial);
@@ -2673,7 +2700,6 @@
                 waveTime += 0.06;
                 wave.scale.setScalar(1 + waveTime * 4);
                 waveMaterial.opacity = Math.max(0, 0.8 - waveTime * 1.5);
-                waveMaterial.emissiveIntensity = 1.5 * (1 - waveTime);
                 
                 if (waveMaterial.opacity > 0.01) {
                     requestAnimationFrame(animateWave);
@@ -2692,9 +2718,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.0
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2731,9 +2755,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 0.3
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2767,9 +2789,7 @@
             const flashMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 3.0
+                opacity: 1
             });
             const flash = new THREE.Mesh(flashGeometry, flashMaterial);
             flash.position.copy(position);
@@ -2781,7 +2801,6 @@
                 flashScale += 1.5;
                 flash.scale.setScalar(flashScale);
                 flashMaterial.opacity *= 0.85;
-                flashMaterial.emissiveIntensity *= 0.9;
                 if (flashMaterial.opacity > 0.01) {
                     requestAnimationFrame(expandFlash);
                 } else {
@@ -2849,9 +2868,7 @@
             const coreMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 5
+                opacity: 1
             });
             const core = new THREE.Mesh(coreGeometry, coreMaterial);
             core.position.copy(position);
@@ -2877,9 +2894,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 2.0
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2895,7 +2910,6 @@
                 
                 lifeTime += 0.03;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 2.0 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animateMegaSpark);
@@ -2915,9 +2929,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.0
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -2949,9 +2961,7 @@
             const waveMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 0.8,
-                emissive: color,
-                emissiveIntensity: 1.5
+                opacity: 0.8
             });
             const wave = new THREE.Mesh(waveGeometry, waveMaterial);
             wave.position.copy(position);
@@ -3641,9 +3651,7 @@
                 const flashMaterial = new THREE.MeshBasicMaterial({ 
                     color: 0x66ffff,
                     transparent: true,
-                    opacity: 1,
-                    emissive: 0x66ffff,
-                    emissiveIntensity: 3
+                    opacity: 1
                 });
                 const flash = new THREE.Mesh(flashGeometry, flashMaterial);
                 flash.position.copy(startPos);
@@ -3849,8 +3857,7 @@
                 const handleGeometry = new THREE.CylinderGeometry(0.12, 0.12, 2, 12);
                 const handleMaterial = new THREE.MeshPhongMaterial({ 
                     color: 0x654321,
-                    shininess: 30,
-                    roughness: 0.8
+                    shininess: 30
                 });
                 const handle = new THREE.Mesh(handleGeometry, handleMaterial);
                 handle.position.y = -2.2; // 鍔の下
@@ -3969,8 +3976,6 @@
                     color: 0xff0000,
                     transparent: true,
                     opacity: 0.8,
-                    emissive: 0xff0000,
-                    emissiveIntensity: 1.0,
                     side: THREE.DoubleSide
                 });
                 const ring = new THREE.Mesh(ringGeometry, ringMaterial);
@@ -4003,9 +4008,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.5
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -4021,7 +4024,6 @@
                 
                 lifeTime += 0.03;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 1.5 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animatePain);
@@ -4038,9 +4040,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.5
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -4056,7 +4056,6 @@
                 
                 lifeTime += 0.02;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 1.5 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animateSpark);
@@ -4076,9 +4075,7 @@
             const sparkMaterial = new THREE.MeshBasicMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 1,
-                emissive: color,
-                emissiveIntensity: 1.0
+                opacity: 1
             });
             const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
             spark.position.copy(position);
@@ -4094,7 +4091,6 @@
                 
                 lifeTime += 0.025;
                 sparkMaterial.opacity = 1 - (lifeTime / maxLife);
-                sparkMaterial.emissiveIntensity = 1.0 * (1 - lifeTime / maxLife);
                 
                 if (lifeTime < maxLife && spark.parent) {
                     requestAnimationFrame(animateBlood);
@@ -4112,8 +4108,6 @@
                 color: 0xff6600,
                 transparent: true,
                 opacity: 0.7,
-                emissive: 0xff6600,
-                emissiveIntensity: 1.2,
                 side: THREE.DoubleSide
             });
             const wave = new THREE.Mesh(waveGeometry, waveMaterial);
@@ -4126,7 +4120,6 @@
                 waveTime += 0.06;
                 wave.scale.setScalar(1 + waveTime * 3);
                 waveMaterial.opacity = Math.max(0, 0.7 - waveTime * 1.5);
-                waveMaterial.emissiveIntensity = 1.2 * (1 - waveTime);
                 
                 if (waveMaterial.opacity > 0.01) {
                     requestAnimationFrame(animateWave);
